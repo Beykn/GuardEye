@@ -15,7 +15,7 @@ class UserIcon extends StatelessWidget {
         shape: BoxShape.circle, // Daire şeklinde
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.5),
+            color: Colors.black.withOpacity(0.5),
             blurRadius: 10,
             spreadRadius: 2,
           ),
