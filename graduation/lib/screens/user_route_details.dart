@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'route_analysis.dart'; // Modelin başlayacağı sayfa
+import 'live_cam.dart'; // Kamera sayfası
 
 class URouteDetailsPage extends StatelessWidget {
   const URouteDetailsPage({super.key});
@@ -17,12 +18,9 @@ class URouteDetailsPage extends StatelessWidget {
             leading: const Icon(Icons.directions),
             title: GestureDetector(
               onTap: () {
-                // Seçilen güzergah için model sayfasına yönlendirme
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => RouteAnalysisPage(routeName: routes[index]),
-                  ),
+                  MaterialPageRoute(builder: (context) => const LiveCam()),
                 );
               },
               child: Text(

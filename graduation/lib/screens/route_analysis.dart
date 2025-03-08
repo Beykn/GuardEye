@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'live_cam.dart'; // Import the LiveCam page
 
 class RouteAnalysisPage extends StatelessWidget {
   final String? routeName;
@@ -7,16 +8,17 @@ class RouteAnalysisPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Navigate to LiveCam immediately when this page is loaded
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const LiveCam()),
+      );
+    });
+
     return Scaffold(
-      appBar: AppBar(title: Text(routeName ?? "Güzergah Analizi")),
       body: Center(
-        child: Text(
-          routeName != null
-              ? "Seçilen güzergah: $routeName"
-              : "Güzergah bilgisi alınamadı.",
-          style: const TextStyle(fontSize: 18),
-          textAlign: TextAlign.center,
-        ),
+        child: CircularProgressIndicator(), // Show a loading indicator briefly
       ),
     );
   }
