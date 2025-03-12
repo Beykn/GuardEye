@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'route_analysis.dart'; // Modelin başlayacağı sayfa
-import 'live_cam.dart'; // Kamera sayfası
+import 'detection/live_cam.dart'; // Kamera sayfası
 
 class URouteDetailsPage extends StatelessWidget {
   const URouteDetailsPage({super.key});

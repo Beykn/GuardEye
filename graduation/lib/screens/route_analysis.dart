@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'live_cam.dart'; // Import the LiveCam page
+import 'detection/live_cam.dart'; // Import the LiveCam page
 
 class RouteAnalysisPage extends StatelessWidget {
   final String? routeName;
