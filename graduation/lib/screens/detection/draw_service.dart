@@ -5,7 +5,7 @@ class BoxPainter extends CustomPainter {
   final List<dynamic> recognitions;
   final Size imageSize;
   final Size screenSize;
-  static const double CONFIDENCE_THRESHOLD = 0.5;
+  static const double CONFIDENCE_THRESHOLD = 0.2;
 
   BoxPainter(this.recognitions, this.imageSize, this.screenSize);
 
@@ -39,12 +39,13 @@ class BoxPainter extends CustomPainter {
         canvas.drawRect(Rect.fromLTRB(left, top, right, bottom), paint);
         var object_class = "";
 
+
         // decode the class label
         if(recognitions[3][0][i].toInt() == 0) object_class = "cigarette";
 
-        else if(recognitions[3][0][i].toInt() == 1) object_class = "phone";
+        else if(recognitions[3][0][i].toInt() == 1) object_class = "vape";
 
-        else object_class = "vape";
+        else object_class = "phone";
 
         final label = 'Class ${object_class}: ${(recognitions[0][0][i] * 100).toStringAsFixed(0)}%';
         textPainter.text = TextSpan(text: label, style: textStyle);

@@ -21,7 +21,8 @@ class _LiveCamState extends State<LiveCam> with WidgetsBindingObserver {
   List<dynamic>? _recognitions;
   Size? previewSize;
   bool _isCameraInitialized = false;
-  int _lastProcessingTime = 0; //Add this line.
+  int _lastProcessingTime = 0; 
+  int _currentCameraIndex = 0;
 
   @override
   void initState() {
@@ -45,7 +46,13 @@ class _LiveCamState extends State<LiveCam> with WidgetsBindingObserver {
     try {
       await _detectionService.loadModel();
       cameras = await availableCameras();
-      final camera = cameras[0];
+
+      if(cameras.isEmpty) {
+        print('No camera available');
+        return;
+      }
+
+      final camera = cameras[_currentCameraIndex];
       _controller = CameraController(
         camera,
         ResolutionPreset.high,
@@ -62,6 +69,19 @@ class _LiveCamState extends State<LiveCam> with WidgetsBindingObserver {
     } catch (e) {
       print('Error initializing camera: $e');
     }
+  }
+
+  Future<void> _switchCamera() async {
+    if(cameras.length <= 1) return;
+
+    await _controller!.dispose();
+
+    setState(() {
+      _isCameraInitialized = false;
+      _currentCameraIndex = (_currentCameraIndex + 1) % cameras.length;
+    });
+
+    await _initializeCamera();
   }
 
   Future<void> _processCameraImage(CameraImage image) async {
@@ -89,31 +109,22 @@ class _LiveCamState extends State<LiveCam> with WidgetsBindingObserver {
     super.dispose();
   }
 
-  @override
+ @override
   Widget build(BuildContext context) {
     if (!_isCameraInitialized) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
+    
     return Scaffold(
       appBar: AppBar(
         title: const Text('Live Object Detection'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.flip_camera_android),
-            onPressed: () async {
-              final cameras = await availableCameras();
-              if (cameras.length > 1) {
-                setState(() {
-                  _isCameraInitialized = false;
-                });
-                _controller?.dispose();
-                final currentCameraIndex = cameras.indexOf(_controller!.description);
-                final newCameraIndex = (currentCameraIndex + 1) % cameras.length;
-                _controller = CameraController(cameras[newCameraIndex], ResolutionPreset.medium, enableAudio: false, imageFormatGroup: Platform.isAndroid ? ImageFormatGroup.yuv420 : ImageFormatGroup.bgra8888);
-                await _initializeCamera();
-              }
-            },
-          ),
+          // Camera switch button
+          if (cameras.length > 1)
+            IconButton(
+              icon: const Icon(Icons.flip_camera_android),
+              onPressed: _switchCamera,
+            ),
         ],
       ),
       body: Stack(
