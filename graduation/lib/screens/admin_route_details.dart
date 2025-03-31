@@ -8,7 +8,7 @@ class ARouteDetailsPage extends StatelessWidget {
     final List<String> routes = ModalRoute.of(context)!.settings.arguments as List<String>;
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Güzergah Detayları")),
+      appBar: AppBar(title: const Text("Route Details")),
       body: ListView.builder(
         itemCount: routes.length,
         itemBuilder: (context, index) {

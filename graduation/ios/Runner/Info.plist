@@ -45,5 +45,7 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Bu uygulama Face ID ile giriş yapmak için izin istiyor.</string>
 </dict>
 </plist>

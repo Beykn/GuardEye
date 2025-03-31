@@ -27,7 +27,7 @@ class UserPage extends StatelessWidget {
             // Güzergah Container (Mavi)
             _buildInfoContainer(
               context,
-              title: "Güzergah",
+              title: "Route",
               icon: Icons.directions_car,
               dataList: DummyData.routes,
               routeName: "/UserRouteDetails",
@@ -39,7 +39,7 @@ class UserPage extends StatelessWidget {
             // Tespitler Container (Kırmızı)
             _buildInfoContainer(
               context,
-              title: "Tespitler",
+              title: "Detections",
               icon: Icons.warning,
               dataList: DummyData.detections,
               routeName: "/detectionDetails",
@@ -90,7 +90,7 @@ class UserPage extends StatelessWidget {
                   onPressed: () {
                     Navigator.pushNamed(context, '/user/detail');
                   },
-                  child: const Text('Detaylara Git'),
+                  child: const Text('Details'),
                 ),
               ],
             ),

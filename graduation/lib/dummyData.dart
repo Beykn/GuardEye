@@ -9,9 +9,9 @@ class DummyData {
   ];
 
   static List<String> detections = [
-    "Sigara İçme - 09:15",
-    "Telefon Kullanımı - 14:45",
-    "Sigara İçme - 18:10",
+    "Cigarette - 09:15",
+    "Phone Usage- 14:45",
+    "Cigarette - 18:10",
   ];
 }
 

@@ -22,10 +22,10 @@ class UserInfo extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.end, // Yazıları sağa yasla
         mainAxisSize: MainAxisSize.min, // Minimum alanı kaplasın
         children: [
-          Text("Ad: $name", style: const TextStyle(color: Colors.white, fontSize: 20)),
-          Text("Soyad: $surname", style: const TextStyle(color: Colors.white, fontSize: 20)),
-          Text("Yaş: $age", style: const TextStyle(color: Colors.white, fontSize: 20)),
-          Text("Deneyim: $experience yıl", style: const TextStyle(color: Colors.white, fontSize: 20)),
+          Text("Name: $name", style: const TextStyle(color: Colors.white, fontSize: 20)),
+          Text("Surname: $surname", style: const TextStyle(color: Colors.white, fontSize: 20)),
+          Text("Age: $age", style: const TextStyle(color: Colors.white, fontSize: 20)),
+          Text("Experience: $experience yıl", style: const TextStyle(color: Colors.white, fontSize: 20)),
         ],
       ),
     );
