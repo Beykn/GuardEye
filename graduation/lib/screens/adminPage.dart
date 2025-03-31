@@ -61,7 +61,7 @@ class AdminPage extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 40),
               ),
               child: const Text(
-                "Çıkış Yap",
+                "EXİT",
                 style: TextStyle(fontSize: 18, color: Colors.white),
               ),
             ),

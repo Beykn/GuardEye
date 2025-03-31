@@ -8,7 +8,7 @@ class DetectionDetailsPage extends StatelessWidget {
     final List<String> detections = ModalRoute.of(context)!.settings.arguments as List<String>;
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Tespitler Detayları")),
+      appBar: AppBar(title: const Text("Detection Details")),
       body: ListView.builder(
         itemCount: detections.length,
         itemBuilder: (context, index) {
