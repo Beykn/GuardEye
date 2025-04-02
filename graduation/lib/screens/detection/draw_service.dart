@@ -47,6 +47,8 @@ class BoxPainter extends CustomPainter {
 
         else object_class = "phone";
 
+        print("detecting ${recognitions[3][0][i].toInt()}");
+
         final label = 'Class ${object_class}: ${(recognitions[0][0][i] * 100).toStringAsFixed(0)}%';
         textPainter.text = TextSpan(text: label, style: textStyle);
         textPainter.layout();
