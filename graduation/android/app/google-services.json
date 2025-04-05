@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "5451830380",
+    "project_id": "guardeye-76fca",
+    "storage_bucket": "guardeye-76fca.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:5451830380:android:4277f5fcc1c2a839cab449",
+        "android_client_info": {
+          "package_name": "com.example.graduation"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCGDgzMjM-EL3ne1iq6WAvUvcSBuvCemFk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
