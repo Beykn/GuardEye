@@ -37,7 +37,7 @@ class _LoginPageState extends State<LoginPage> {
 
       if (isAuthenticated) {
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => const UserPage()));
+            context, MaterialPageRoute(builder: (context) =>  UserPage()));
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -106,7 +106,7 @@ class _LoginPageState extends State<LoginPage> {
                     {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const UserPage()),
+                        MaterialPageRoute(builder: (context) =>  UserPage()),
                       );
                     }
                   }

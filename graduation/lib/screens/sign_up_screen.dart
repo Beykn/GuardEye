@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:graduation/services/auth.dart';
+import 'package:graduation/screens/loginPage.dart';
 
 class SignUpScreen extends StatefulWidget {
   @override
@@ -13,6 +14,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   late String email;
   late String password;
+  late String first_name;
+  late String last_name;
+  late String age;
   String error = '';
 
   bool showSpinner = false;
@@ -29,6 +33,34 @@ class _SignUpScreenState extends State<SignUpScreen> {
           key: _formKey,
           child: Column(
             children: <Widget>[
+
+              TextFormField(
+                keyboardType: TextInputType.name,
+                onChanged: (value) {
+                  first_name = value;
+                },
+                decoration: InputDecoration(
+                  hintText: 'Enter your first name',
+                ),
+              ),
+              TextFormField(
+                keyboardType: TextInputType.name,
+                onChanged: (value) {
+                  last_name = value;
+                },
+                decoration: InputDecoration(
+                  hintText: 'Enter your last name',
+                ),
+              ),
+              TextFormField(
+                keyboardType: TextInputType.name,
+                onChanged: (value) {
+                  age = value;
+                },
+                decoration: InputDecoration(
+                  hintText: 'Enter your age',
+                ),
+              ),
               TextFormField(
                 keyboardType: TextInputType.emailAddress,
                 onChanged: (value) {
@@ -57,7 +89,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 onPressed: () async {
                   if(_formKey.currentState!.validate()){
                     
-                    dynamic result = await _firebase_auth.registerWithEmailAndPassword(email,password);
+                    dynamic result = await _firebase_auth.registerWithEmailAndPassword(email,password,first_name,last_name,age);
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) =>  LoginPage()),
+                      );
 
                     if(result == null){
                       setState(() => error = 'something went wrong');

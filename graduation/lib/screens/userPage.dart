@@ -1,14 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:graduation/userIcon.dart';
-import 'package:graduation/userInfo.dart';
+import 'package:graduation/services/database.dart'; // Import DatabaseService
+import 'package:graduation/models/userInfo.dart'; // Import UserInfo model
 import 'package:graduation/dummyData.dart';
-
-class UserPage extends StatelessWidget {
+import 'package:graduation/userIcon.dart';
+class UserPage extends StatefulWidget {
   const UserPage({super.key});
 
-  static const double containerHeight = 180; // Tüm container'ların sabit yüksekliği
-  static const double containerWidth = double.infinity; // Tüm container'lar genişlik olarak aynı
+  @override
+  _UserPageState createState() => _UserPageState();
+}
+
+class _UserPageState extends State<UserPage> {
+  late String uid;
+  late DatabaseService dbService;
+  late Future<Driver?> userDataFuture; 
+
+
+  @override
+  void initState() {
+    super.initState();
+    uid = FirebaseAuth.instance.currentUser?.uid ?? '';
+    dbService = DatabaseService(uid: uid);
+    userDataFuture = dbService.getDriverData(); // Fetch data when the page is initialized
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,55 +32,59 @@ class UserPage extends StatelessWidget {
       appBar: AppBar(title: const Text("User Page")),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            // Kullanıcı Bilgi Kartı (Gri)
-            _buildUserCard(context),
+        child: FutureBuilder<Driver?>(
+          future: userDataFuture,  // Use the future from DatabaseService
+          builder: (context, snapshot) {
 
-            const SizedBox(height: 20.0),
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return const Center(child: Text("Error loading user info"));
+            } else if (!snapshot.hasData || snapshot.data == null) {
+              return const Center(child: Text("No user data found"));
+            }
 
-            // Güzergah Container (Mavi)
-            _buildInfoContainer(
-              context,
-              title: "Route",
-              icon: Icons.directions_car,
-              dataList: DummyData.routes,
-              routeName: "/UserRouteDetails",
-              color: Colors.blue.shade800, // Soft mavi ton
-            ),
-
-            const SizedBox(height: 20.0),
-
-            // Tespitler Container (Kırmızı)
-            _buildInfoContainer(
-              context,
-              title: "Detections",
-              icon: Icons.warning,
-              dataList: DummyData.detections,
-              routeName: "/detectionDetails",
-              color: Colors.red.shade800, // Soft kırmızı ton
-            ),
-          ],
+            final user = snapshot.data!;
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                _buildUserCard(context, user),
+                const SizedBox(height: 20.0),
+                _buildInfoContainer(
+                  context,
+                  title: "Route",
+                  icon: Icons.directions_car,
+                  dataList: DummyData.routes,
+                  routeName: "/UserRouteDetails",
+                  color: Colors.blue.shade800,
+                ),
+                const SizedBox(height: 20.0),
+                _buildInfoContainer(
+                  context,
+                  title: "Detections",
+                  icon: Icons.warning,
+                  dataList: DummyData.detections,
+                  routeName: "/detectionDetails",
+                  color: Colors.red.shade800,
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
   }
 
-  // Kullanıcı Bilgi Kartı (Gri)
-  Widget _buildUserCard(BuildContext context) {
+  // Build the user info card
+  Widget _buildUserCard(BuildContext context, Driver user) {
     return Container(
-      height: containerHeight,
-      width: containerWidth,
+      height: 180,
+      width: double.infinity,
       decoration: BoxDecoration(
-        color: Colors.grey.shade700, // Kullanıcı kartı için soft gri ton
+        color: Colors.grey.shade700,
         borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black26,
-            blurRadius: 5,
-            offset: Offset(2, 2),
-          ),
+        boxShadow: const [
+          BoxShadow(color: Colors.black26, blurRadius: 5, offset: Offset(2, 2)),
         ],
       ),
       child: Row(
@@ -80,12 +100,9 @@ class UserPage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                UserInfo(
-                  name: 'Beyhan',
-                  surname: 'Kandemir',
-                  age: 24,
-                  experience: 4,
-                ),
+                Text("Name: ${user.firstName}", style: const TextStyle(color: Colors.white, fontSize: 20)),
+                Text("Surname: ${user.lastName}", style: const TextStyle(color: Colors.white, fontSize: 20)),
+                Text("Age: ${user.age}", style: const TextStyle(color: Colors.white, fontSize: 20)),
                 ElevatedButton(
                   onPressed: () {
                     Navigator.pushNamed(context, '/user/detail');
@@ -100,7 +117,7 @@ class UserPage extends StatelessWidget {
     );
   }
 
-  // Güzergah ve Tespitler için Bilgi Konteyneri
+  // Build route and detection info containers (same as before)
   Widget _buildInfoContainer(BuildContext context, {
     required String title,
     required IconData icon,
@@ -117,17 +134,13 @@ class UserPage extends StatelessWidget {
         );
       },
       child: Container(
-        height: containerHeight, // Kullanıcı bilgileri ile aynı yükseklikte
-        width: containerWidth, // Kullanıcı bilgileri ile aynı genişlikte
+        height: 180,
+        width: double.infinity,
         decoration: BoxDecoration(
           color: color,
           borderRadius: BorderRadius.circular(10),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black26,
-              blurRadius: 5,
-              offset: Offset(2, 2),
-            ),
+          boxShadow: const [
+            BoxShadow(color: Colors.black26, blurRadius: 5, offset: Offset(2, 2)),
           ],
         ),
         child: Column(
