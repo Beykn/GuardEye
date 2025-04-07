@@ -22,7 +22,7 @@ class AdminPage extends StatelessWidget {
               icon: Icons.people,
               color: Colors.blueAccent,
               onTap: () {
-                Navigator.pushNamed(context, "/user"); // User sayfasına yönlendirme
+                Navigator.pushNamed(context, "/user");
               },
             ),
             const SizedBox(height: 16),
@@ -34,7 +34,7 @@ class AdminPage extends StatelessWidget {
               icon: Icons.admin_panel_settings,
               color: Colors.greenAccent,
               onTap: () {
-                Navigator.pushNamed(context, "/admin/detail"); // Admin detay sayfası (oluşturulmalı)
+                Navigator.pushNamed(context, "/admin/detail"); 
               },
             ),
             const SizedBox(height: 16),

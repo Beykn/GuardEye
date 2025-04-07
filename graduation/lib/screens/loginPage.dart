@@ -102,11 +102,18 @@ class _LoginPageState extends State<LoginPage> {
                   if (_formKey.currentState?.validate() ?? false) {
                     dynamic result = await _firebase_auth.signInWithEmailAndPassword(email, password);
 
-                    if(result != null)
+                    if(result != null && result.role == "driver")
                     {
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) =>  UserPage()),
+                      );
+                    }
+
+                    else if(result != null && result.role == "admin"){
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) =>  AdminPage()),
                       );
                     }
                   }

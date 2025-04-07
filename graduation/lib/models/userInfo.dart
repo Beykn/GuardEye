@@ -3,11 +3,13 @@ class Driver {
   final String firstName;
   final String lastName;
   final int age;
+  final String role;
 
   Driver({
     required this.firstName,
     required this.lastName,
     required this.age,
+    required this.role
   });
 
   // Map Firestore document to User object
@@ -16,15 +18,9 @@ class Driver {
       firstName: firestoreData['first_name'] ?? '',
       lastName: firestoreData['last_name'] ?? '',
       age: int.tryParse(firestoreData['age'].toString()) ?? 0,
+      role: firestoreData['role'] ?? ''
     );
   }
 
-  // Optional: to map the User model back to Firestore format (if you need to save data)
-  Map<String, dynamic> toMap() {
-    return {
-      'first_name': firstName,
-      'last_name': lastName,
-      'age': age,
-    };
-  }
+ 
 }
