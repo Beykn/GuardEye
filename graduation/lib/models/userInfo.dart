@@ -4,12 +4,16 @@ class Driver {
   final String lastName;
   final int age;
   final String role;
+  final String UID;
+  final List<Map<String, dynamic>> trips;
 
   Driver({
     required this.firstName,
     required this.lastName,
     required this.age,
-    required this.role
+    required this.role,
+    required this.UID,
+    required this.trips,
   });
 
   // Map Firestore document to User object
@@ -18,9 +22,13 @@ class Driver {
       firstName: firestoreData['first_name'] ?? '',
       lastName: firestoreData['last_name'] ?? '',
       age: int.tryParse(firestoreData['age'].toString()) ?? 0,
-      role: firestoreData['role'] ?? ''
+      role: firestoreData['role'] ?? '',
+      UID: firestoreData['id'] ?? '',
+      trips: List<Map<String, dynamic>>.from(firestoreData['trips'] ?? []),
+      
     );
   }
+  
 
  
 }

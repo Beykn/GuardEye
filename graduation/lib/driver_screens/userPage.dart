@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:graduation/driver_screens/driver_trips_page.dart';
+import 'package:graduation/dummyData.dart';
 import 'package:graduation/services/database.dart'; // Import DatabaseService
 import 'package:graduation/models/userInfo.dart'; // Import UserInfo model
-import 'package:graduation/dummyData.dart';
 import 'package:graduation/userIcon.dart';
+
 class UserPage extends StatefulWidget {
   const UserPage({super.key});
 
@@ -14,16 +16,15 @@ class UserPage extends StatefulWidget {
 
 class _UserPageState extends State<UserPage> {
   late String uid;
-  late DatabaseService dbService;
+  late UserDatabaseService dbService;
   late Future<Driver?> userDataFuture; 
-
 
   @override
   void initState() {
     super.initState();
     uid = FirebaseAuth.instance.currentUser?.uid ?? '';
-    dbService = DatabaseService(uid: uid);
-    userDataFuture = dbService.getDriverData(); // Fetch data when the page is initialized
+    dbService = UserDatabaseService(uid: uid);
+    userDataFuture = dbService.getDriverData(); // Fetch driver data
   }
 
   @override
@@ -35,7 +36,6 @@ class _UserPageState extends State<UserPage> {
         child: FutureBuilder<Driver?>(
           future: userDataFuture,  // Use the future from DatabaseService
           builder: (context, snapshot) {
-
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
             } else if (snapshot.hasError) {
@@ -50,23 +50,9 @@ class _UserPageState extends State<UserPage> {
               children: <Widget>[
                 _buildUserCard(context, user),
                 const SizedBox(height: 20.0),
-                _buildInfoContainer(
-                  context,
-                  title: "Route",
-                  icon: Icons.directions_car,
-                  dataList: DummyData.routes,
-                  routeName: "/UserRouteDetails",
-                  color: Colors.blue.shade800,
-                ),
+                _buildRouteContainer(context, user),
                 const SizedBox(height: 20.0),
-                _buildInfoContainer(
-                  context,
-                  title: "Detections",
-                  icon: Icons.warning,
-                  dataList: DummyData.detections,
-                  routeName: "/detectionDetails",
-                  color: Colors.red.shade800,
-                ),
+                _buildDetectionContainer(context),
               ],
             );
           },
@@ -117,27 +103,25 @@ class _UserPageState extends State<UserPage> {
     );
   }
 
-  // Build route and detection info containers (same as before)
-  Widget _buildInfoContainer(BuildContext context, {
-    required String title,
-    required IconData icon,
-    required List<String> dataList,
-    required String routeName,
-    required Color color,
-  }) {
+  // Create a method for building the route container
+  Widget _buildRouteContainer(BuildContext context, Driver user) {
     return GestureDetector(
       onTap: () {
-        Navigator.pushNamed(
+        Navigator.push(
           context,
-          routeName,
-          arguments: dataList,
+          MaterialPageRoute(
+            builder: (context) => DriverTripsPage(
+              driverId: uid,
+              driverName: "${user.firstName} ${user.lastName}",
+            ),
+          ),
         );
       },
       child: Container(
         height: 180,
         width: double.infinity,
         decoration: BoxDecoration(
-          color: color,
+          color: Colors.blue.shade800,
           borderRadius: BorderRadius.circular(10),
           boxShadow: const [
             BoxShadow(color: Colors.black26, blurRadius: 5, offset: Offset(2, 2)),
@@ -146,11 +130,48 @@ class _UserPageState extends State<UserPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 40, color: Colors.black54),
+            Icon(Icons.directions_car, size: 40, color: Colors.black54),
             const SizedBox(height: 10),
-            Text(
-              title,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
+            const Text(
+              "Route",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
+            ),
+            const SizedBox(height: 10),
+            const Icon(Icons.arrow_forward_ios, color: Colors.black54),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Create a method for building the detection container
+  Widget _buildDetectionContainer(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(
+          context,
+          "/detectionDetails",
+          arguments: DummyData.detections.map((detection) => {'detection': detection}).toList(),
+        );
+      },
+      child: Container(
+        height: 180,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: Colors.red.shade800,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: const [
+            BoxShadow(color: Colors.black26, blurRadius: 5, offset: Offset(2, 2)),
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.warning, size: 40, color: Colors.black54),
+            const SizedBox(height: 10),
+            const Text(
+              "Detections",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
             ),
             const SizedBox(height: 10),
             const Icon(Icons.arrow_forward_ios, color: Colors.black54),

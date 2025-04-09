@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:graduation/screens/userPage.dart';
-import 'package:graduation/screens/adminPage.dart';
+import 'package:graduation/driver_screens/userPage.dart';
+import 'package:graduation/admin_screens.dart/adminPage.dart';
 import 'package:graduation/screens/sign_up_screen.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:graduation/services/auth.dart';

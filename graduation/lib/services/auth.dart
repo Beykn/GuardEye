@@ -7,11 +7,11 @@ import 'package:graduation/models/userInfo.dart';
 class AuthService{
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  late DatabaseService _databaseService;
+  late UserDatabaseService _databaseService;
 
   Future<MyUser?> _userFromFirebase(User? user) async {
   if (user != null) {
-    _databaseService = DatabaseService(uid: user.uid);
+    _databaseService = UserDatabaseService(uid: user.uid);
     Driver? driverData = await _databaseService.getDriverData();
     if (driverData != null) {
       return MyUser(uid: user.uid, role: driverData.role);
@@ -36,7 +36,7 @@ class AuthService{
       UserCredential result = await _auth.createUserWithEmailAndPassword(email: email, password: password);
       User? user = result.user;
 
-      _databaseService = DatabaseService(uid: user!.uid);
+      _databaseService = UserDatabaseService(uid: user!.uid);
       await _databaseService.updateUserData(first_name, last_name, email, age); 
       return await _userFromFirebase(user); 
     } catch (e) {

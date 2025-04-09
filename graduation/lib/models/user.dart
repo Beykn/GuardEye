@@ -1,3 +1,4 @@
+// this class is used to help in authentication
 class MyUser{
 
   final String uid;

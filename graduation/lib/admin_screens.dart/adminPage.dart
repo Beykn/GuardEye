@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:graduation/admin_screens.dart/user_list_page.dart'; 
 
 class AdminPage extends StatelessWidget {
   const AdminPage({super.key});
@@ -22,7 +23,7 @@ class AdminPage extends StatelessWidget {
               icon: Icons.people,
               color: Colors.blueAccent,
               onTap: () {
-                Navigator.pushNamed(context, "/user");
+                Navigator.pushNamed(context, "/userList");
               },
             ),
             const SizedBox(height: 16),
