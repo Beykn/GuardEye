@@ -1,5 +1,8 @@
+import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:graduation/models/userInfo.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+
 
 class UserDatabaseService {
   final String uid;
@@ -37,6 +40,36 @@ class UserDatabaseService {
       return [];
     }
   }
+
+  Future<void> addViolation({ required String type, required DateTime timestamp, double? confidence,String? imageBase64, }) async {
+    try {
+      await _driverCollection.doc(uid).collection('violations').add({
+        'type': type,
+        'timestamp': timestamp.toIso8601String(),
+        'confidence': confidence,
+        'imageBase64': imageBase64, // Save the base64 string here
+      });
+      print('Violation added successfully');
+    } catch (e) {
+      print('Error adding violation: $e');
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getViolations() async {
+    try {
+      QuerySnapshot snapshot = await _driverCollection
+          .doc(uid)
+          .collection('violations')
+          .orderBy('timestamp', descending: true)
+          .get();
+
+      return snapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
+    } catch (e) {
+      print("Error fetching violations: $e");
+      return [];
+    }
+  }
+
 
   // Get user data (driver)
   Future<Driver?> getDriverData() async {

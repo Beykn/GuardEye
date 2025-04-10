@@ -49,7 +49,7 @@ class DriverTripsPage extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => LiveCam(),
+                      builder: (context) => LiveCam(uid: driverId), // Pass the trip data to LiveCam
                     ),
                   );
                 },

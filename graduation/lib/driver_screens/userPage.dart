@@ -6,6 +6,7 @@ import 'package:graduation/dummyData.dart';
 import 'package:graduation/services/database.dart'; // Import DatabaseService
 import 'package:graduation/models/userInfo.dart'; // Import UserInfo model
 import 'package:graduation/userIcon.dart';
+import 'package:graduation/driver_screens/detection_details.dart';
 
 class UserPage extends StatefulWidget {
   const UserPage({super.key});
@@ -148,11 +149,15 @@ class _UserPageState extends State<UserPage> {
   Widget _buildDetectionContainer(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.pushNamed(
+        Navigator.push(
           context,
-          "/detectionDetails",
-          arguments: DummyData.detections.map((detection) => {'detection': detection}).toList(),
+          MaterialPageRoute(
+            builder: (context) => ViolationDetailsPage(
+              userDb: UserDatabaseService(uid: uid),
+            ),
+          ),
         );
+
       },
       child: Container(
         height: 180,
