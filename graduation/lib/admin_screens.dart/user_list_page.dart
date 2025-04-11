@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:graduation/admin_screens.dart/driver_options_page.dart';
 import 'package:graduation/models/userInfo.dart'; // For Driver class
-import 'package:graduation/admin_screens.dart/driver_routes_page.dart'; 
 import 'package:graduation/services/admin_database_service.dart'; // Import AdminDatabaseService
 
 class UserListPage extends StatefulWidget {
@@ -63,13 +63,14 @@ class _UserListPageState extends State<UserListPage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => DriverDetailPage(
+                              builder: (context) => DriverOptionsPage(
                                 driverId: driver.UID,
                                 driverName: "${driver.firstName} ${driver.lastName}",
                               ),
                             ),
                           );
                         },
+
                       ),
                     );
                   },
