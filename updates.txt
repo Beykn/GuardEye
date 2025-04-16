@@ -1,0 +1,6 @@
+i've updated the violation upload mechanism to use queue, because previously it was uploading directly from the loop that runs the model
+and that resulted in low FPS, cause the model was waiting for the violations to be uploaded, right now the violations are handeled seprately
+by a queue so they don't block the model and the FPS is back to normal
+
+i tried to use threads to upload the violations, a seprate thread for uploading the violations, but it was too slow cause we already has
+alot of threads running(UI thread and model thread)

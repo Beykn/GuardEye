@@ -71,6 +71,7 @@ flutter:
   assets:
     - assets/3cls_640_ssd.tflite
     - assets/2cls_640_ssd.tflite
+    - assets/ssd_3cls_aug.tflite
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
