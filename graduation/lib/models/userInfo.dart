@@ -19,13 +19,12 @@ class Driver {
   // Map Firestore document to User object
   factory Driver.fromFirestore(Map<String, dynamic> firestoreData) {
     return Driver(
-      firstName: firestoreData['first_name'] ?? '',
-      lastName: firestoreData['last_name'] ?? '',
+      firstName: firestoreData['firstName'] ?? '',
+      lastName: firestoreData['lastName'] ?? '',
       age: int.tryParse(firestoreData['age'].toString()) ?? 0,
       role: firestoreData['role'] ?? '',
       UID: firestoreData['id'] ?? '',
       trips: List<Map<String, dynamic>>.from(firestoreData['trips'] ?? []),
-      
     );
   }
   

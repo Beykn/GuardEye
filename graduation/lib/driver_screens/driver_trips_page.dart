@@ -10,7 +10,7 @@ class DriverTripsPage extends StatelessWidget {
   const DriverTripsPage({
     super.key,
     required this.driverId,
-    required this.driverName,
+    required this.driverName, required bool onlyView,
   });
 
   @override

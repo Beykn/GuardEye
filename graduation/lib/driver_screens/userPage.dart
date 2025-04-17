@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:graduation/driver_screens/driver_trips_page.dart';
-import 'package:graduation/dummyData.dart';
-import 'package:graduation/services/database.dart'; // Import DatabaseService
-import 'package:graduation/models/userInfo.dart'; // Import UserInfo model
+import 'package:graduation/services/database.dart';
+import 'package:graduation/models/userInfo.dart';
 import 'package:graduation/userIcon.dart';
 import 'package:graduation/driver_screens/detection_details.dart';
+import '../userDetail.dart';
 
 class UserPage extends StatefulWidget {
   const UserPage({super.key});
@@ -18,14 +18,14 @@ class UserPage extends StatefulWidget {
 class _UserPageState extends State<UserPage> {
   late String uid;
   late UserDatabaseService dbService;
-  late Future<Driver?> userDataFuture; 
+  late Future<Driver?> userDataFuture;
 
   @override
   void initState() {
     super.initState();
     uid = FirebaseAuth.instance.currentUser?.uid ?? '';
     dbService = UserDatabaseService(uid: uid);
-    userDataFuture = dbService.getDriverData(); // Fetch driver data
+    userDataFuture = dbService.getDriverData();
   }
 
   @override
@@ -35,7 +35,7 @@ class _UserPageState extends State<UserPage> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: FutureBuilder<Driver?>(
-          future: userDataFuture,  // Use the future from DatabaseService
+          future: userDataFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
@@ -62,7 +62,6 @@ class _UserPageState extends State<UserPage> {
     );
   }
 
-  // Build the user info card
   Widget _buildUserCard(BuildContext context, Driver user) {
     return Container(
       height: 180,
@@ -91,8 +90,18 @@ class _UserPageState extends State<UserPage> {
                 Text("Surname: ${user.lastName}", style: const TextStyle(color: Colors.white, fontSize: 20)),
                 Text("Age: ${user.age}", style: const TextStyle(color: Colors.white, fontSize: 20)),
                 ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/user/detail');
+                  onPressed: () async {
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => UserDetail(uid: uid),
+                      ),
+                    );
+                    if (result == true) {
+                      setState(() {
+                        userDataFuture = dbService.getDriverData();
+                      });
+                    }
                   },
                   child: const Text('Details'),
                 ),
@@ -104,7 +113,6 @@ class _UserPageState extends State<UserPage> {
     );
   }
 
-  // Create a method for building the route container
   Widget _buildRouteContainer(BuildContext context, Driver user) {
     return GestureDetector(
       onTap: () {
@@ -113,7 +121,7 @@ class _UserPageState extends State<UserPage> {
           MaterialPageRoute(
             builder: (context) => DriverTripsPage(
               driverId: uid,
-              driverName: "${user.firstName} ${user.lastName}",
+              driverName: "${user.firstName} ${user.lastName}", onlyView: false,
             ),
           ),
         );
@@ -145,7 +153,6 @@ class _UserPageState extends State<UserPage> {
     );
   }
 
-  // Create a method for building the detection container
   Widget _buildDetectionContainer(BuildContext context) {
     return GestureDetector(
       onTap: () {
@@ -157,7 +164,6 @@ class _UserPageState extends State<UserPage> {
             ),
           ),
         );
-
       },
       child: Container(
         height: 180,

@@ -10,6 +10,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:graduation/admin_screens.dart/user_list_page.dart';
 import 'package:graduation/driver_screens/driver_trips_page.dart';
 
+import 'admin_screens.dart/admin_detail.dart';
+
 void main() async  {
   
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,8 +35,9 @@ class MyApp extends StatelessWidget {
         '/': (context) => const LoginPage(),
         '/user': (context) => const UserPage(),
         '/userList': (context) => const UserListPage(),
-        '/user/detail': (context) => const UserDetail(),
+        '/user/detail': (context) => const UserDetail(uid: '',),
         '/admin': (context) => const AdminPage(),
+        '/admin/detail': (context) => AdminDetailPage(),
         '/AdminRouteDetails': (context) => const ARouteDetailsPage(),
 
       },
