@@ -16,7 +16,7 @@ class _LoginPageState extends State<LoginPage> {
   String email = '';
   String password = '';
   bool _obscureText = true;
-  
+
   final LocalAuthentication _auth = LocalAuthentication();
   final _formKey = GlobalKey<FormState>();
   final _firebase_auth = AuthService();
@@ -37,7 +37,7 @@ class _LoginPageState extends State<LoginPage> {
 
       if (isAuthenticated) {
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) =>  UserPage()));
+            context, MaterialPageRoute(builder: (context) => UserPage()));
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -53,134 +53,155 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Login Page")),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const Text(
-                "WELLCOME!",
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 20),
-
-              // Email input field
-              TextFormField(
-                keyboardType: TextInputType.emailAddress,
-                onChanged: (value) {
-                  email = value;
-                },
-                validator: (value) =>
-                    value!.isEmpty ? 'Enter an email' : null,
-                decoration: const InputDecoration(
-                  hintText: 'Enter your email',
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Text(
+                  "WELCOME!",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.2,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16),
+                const SizedBox(height: 30),
 
-              // Password input field
-              TextFormField(
-                obscureText: _obscureText,
-                onChanged: (value) {
-                  password = value;
-                },
-                validator: (value) =>
-                    value!.length < 6 ? 'Enter a password 6+ chars long' : null,
-                decoration: const InputDecoration(
-                  hintText: 'Enter your password',
+                // Email field
+                TextFormField(
+                  keyboardType: TextInputType.emailAddress,
+                  onChanged: (value) => email = value,
+                  validator: (value) =>
+                  value!.isEmpty ? 'Enter an email' : null,
+                  decoration: const InputDecoration(
+                    labelText: 'Email',
+                    prefixIcon: Icon(Icons.email),
+                    border: OutlineInputBorder(),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 20),
+                const SizedBox(height: 16),
 
-              // Sign In Button
-              ElevatedButton(
-                onPressed: () async {
-                  if (_formKey.currentState?.validate() ?? false) {
-                    dynamic result = await _firebase_auth.signInWithEmailAndPassword(email, password);
-
-                    if(result != null && result.role == "driver")
-                    {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) =>  UserPage()),
-                      );
-                    }
-
-                    else if(result != null && result.role == "admin"){
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) =>  AdminPage()),
-                      );
-                    }
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blueAccent,
-                  padding: const EdgeInsets.symmetric(vertical: 15),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10)),
-                ),
-                child: const Text("Sign In",
-                    style: TextStyle(fontSize: 18, color: Colors.white)),
-              ),
-              const SizedBox(height: 20),
-
-              // Biometrics Button
-              ElevatedButton.icon(
-                onPressed: _authenticateWithBiometrics,
-                icon: const Icon(Icons.fingerprint),
-                label: const Text("Face ID / Finger Print"),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  padding: const EdgeInsets.symmetric(vertical: 15),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10)),
-                ),
-              ),
-              const SizedBox(height: 10),
-
-              // Forget Password Button
-              ElevatedButton(
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text("Şifre sıfırlama işlemi yakında eklenecek."),
-                      backgroundColor: Colors.orange,
+                // Password field
+                TextFormField(
+                  obscureText: _obscureText,
+                  onChanged: (value) => password = value,
+                  validator: (value) => value!.length < 6
+                      ? 'Enter a password 6+ chars long'
+                      : null,
+                  decoration: InputDecoration(
+                    labelText: 'Password',
+                    prefixIcon: const Icon(Icons.lock),
+                    border: const OutlineInputBorder(),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscureText
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _obscureText = !_obscureText;
+                        });
+                      },
                     ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orange,
-                  padding: const EdgeInsets.symmetric(vertical: 15),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10)),
+                  ),
                 ),
-                child: const Text("Forget Password",
-                    style: TextStyle(color: Colors.white)),
-              ),
-              const SizedBox(height: 10),
+                const SizedBox(height: 30),
 
-              // Sign Up Button
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) =>  SignUpScreen()),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.grey,
-                  padding: const EdgeInsets.symmetric(vertical: 15),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10)),
+                // Sign In
+                ElevatedButton(
+                  onPressed: () async {
+                    if (_formKey.currentState?.validate() ?? false) {
+                      dynamic result =
+                      await _firebase_auth.signInWithEmailAndPassword(
+                          email, password);
+                      if (result != null && result.role == "driver") {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const UserPage()),
+                        );
+                      } else if (result != null && result.role == "admin") {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const AdminPage()),
+                        );
+                      }
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    padding: const EdgeInsets.symmetric(vertical: 15),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8)),
+                  ),
+                  child: const Text("Sign In",
+                      style: TextStyle(fontSize: 18, color: Colors.white)),
                 ),
-                child: const Text("Sign Up", style: TextStyle(color: Colors.white)),
-              ),
-            ],
+                const SizedBox(height: 15),
+
+                // Biometrics
+                ElevatedButton.icon(
+                  onPressed: _authenticateWithBiometrics,
+                  icon: const Icon(Icons.fingerprint),
+                  label: const Text("Use Face ID / Fingerprint"),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.indigo,
+                    padding: const EdgeInsets.symmetric(vertical: 15),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8)),
+                  ),
+                ),
+                const SizedBox(height: 15),
+
+                // Forgot Password
+                TextButton(
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content:
+                        Text("Şifre sıfırlama işlemi yakında eklenecek."),
+                        backgroundColor: Colors.deepOrange,
+                      ),
+                    );
+                  },
+                  child: const Text(
+                    "Forgot Password?",
+                    style:
+                    TextStyle(color: Colors.deepOrange, fontSize: 14),
+                  ),
+                ),
+                const SizedBox(height: 10),
+
+                // Sign Up
+                OutlinedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => SignUpScreen()),
+                    );
+                  },
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 15),
+                    side: const BorderSide(color: Colors.blueAccent),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8)),
+                  ),
+                  child: const Text("Sign Up",
+                      style: TextStyle(
+                          color: Colors.blueAccent, fontSize: 16)),
+                ),
+                const SizedBox(height: 30),
+              ],
+            ),
           ),
         ),
       ),
