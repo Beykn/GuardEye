@@ -81,6 +81,21 @@ class AdminDatabaseService {
       }
     }
 
+  // delete trip 
+  Future<void> deleteTrip(String driverId, String tripId) async {
+    try {
+      await _firestore
+          .collection('drivers')
+          .doc(driverId)
+          .collection('trips')
+          .doc(tripId)
+          .delete();
+    } catch (e) {
+      print("Error deleting trip: $e");
+      rethrow;
+    }
+  }
+
 
   Future<void> addTripToDriver(String uid,Map<String, dynamic> tripData) async {
     try {
@@ -95,6 +110,51 @@ class AdminDatabaseService {
     }
   }
 
+  // update admin data
+  Future<void> updateAdminData(String uid, Map<String, dynamic> data) async {
+    try {
+      await _driverCollection.doc(uid).update(data);
+    } catch (e) {
+      print("Error updating admin data: $e");
+      rethrow;
+    }
+  }
+
+  // update driver data
+  Future<void> updateDriverData(String uid, Map<String, dynamic> data) async {
+    try {
+      await _driverCollection.doc(uid).update(data);
+    } catch (e) {
+      print("Error updating driver data: $e");
+      rethrow;
+    }
+  }
+
+  // Get driver data (admin use)
+  Future<Driver?> getDriverDataWithoutTrips(String driverId) async {
+    try {
+      DocumentSnapshot snapshot = await _driverCollection.doc(driverId).get();
+
+      if (snapshot.exists) {
+        Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+
+        return Driver(
+          firstName: data['first_name'] ?? '',
+          lastName: data['last_name'] ?? '',
+          age: int.tryParse(data['age'].toString()) ?? 0,
+          role: data['role'] ?? '',
+          UID: snapshot.id,
+          trips: [],
+        );
+      } else {
+        return null;
+      }
+    } catch (e) {
+      print("Error fetching driver data: $e");
+      return null;
+    }
+  }
+
   // Get driver data with trips (admin use)
   Future<Driver?> getDriverData(String driverId) async {
     try {
@@ -102,7 +162,7 @@ class AdminDatabaseService {
 
       if (snapshot.exists) {
         Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
-        List<Map<String, dynamic>> trips = await _getTripsFromFirestore(driverId);
+        List<Map<String, dynamic>> trips = await getTripsFromFirestore(driverId);
 
         return Driver(
           firstName: data['first_name'] ?? '',
@@ -121,7 +181,7 @@ class AdminDatabaseService {
     }
   }
 
-  Future<List<Map<String, dynamic>>> _getTripsFromFirestore(String driverId) async {
+  Future<List<Map<String, dynamic>>> getTripsFromFirestore(String driverId) async {
     try {
       QuerySnapshot snapshot = await _firestore
           .collection('drivers')

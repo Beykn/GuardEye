@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:graduation/models/userInfo.dart';
+import 'package:graduation/services/admin_database_service.dart';
+import 'package:graduation/services/auth.dart';
 
 class UserDetail extends StatefulWidget {
   final String uid;
@@ -13,8 +16,7 @@ class UserDetail extends StatefulWidget {
 
 class _UserDetailState extends State<UserDetail> {
   final _formKey = GlobalKey<FormState>();
-  final _firestore = FirebaseFirestore.instance;
-  final _auth = FirebaseAuth.instance;
+  final _dbService = AdminDatabaseService();
 
   late TextEditingController _firstNameController;
   late TextEditingController _lastNameController;
@@ -22,6 +24,8 @@ class _UserDetailState extends State<UserDetail> {
 
   bool _isLoading = true;
   bool _isEditable = false;
+
+  late Driver userInfo;
 
   @override
   void initState() {
@@ -34,22 +38,25 @@ class _UserDetailState extends State<UserDetail> {
 
   Future<void> _loadDataAndCheckRole() async {
     try {
-      // 1. Admin kontrolü
-      final currentUid = _auth.currentUser?.uid;
+
+      // check if its admin to give him update permission
+      final currentUid = FirebaseAuth.instance.currentUser?.uid;
       if (currentUid != null) {
-        final adminSnapshot = await _firestore.collection('drivers').doc(currentUid).get();
-        final role = adminSnapshot.data()?['role'];
-        _isEditable = (role == 'admin');
+        final adminData = await _dbService.getDriverData(currentUid);
+        final isAdmin = adminData?.role == 'admin';
+        _isEditable = isAdmin;
       }
 
-      // 2. Kullanıcı verisini yükle
-      final snapshot = await _firestore.collection('drivers').doc(widget.uid).get();
-      if (snapshot.exists) {
-        final data = snapshot.data()!;
-        _firstNameController.text = data['first_name'] ?? '';
-        _lastNameController.text = data['last_name'] ?? '';
-        _ageController.text = data['age']?.toString() ?? '';
+      // Fetch user data
+      userInfo = (await _dbService.getDriverData(widget.uid))!;
+      
+      if (userInfo != null) {
+        _firstNameController.text = userInfo.firstName ?? '';
+        _lastNameController.text = userInfo.lastName ?? '';
+        _ageController.text = userInfo.age?.toString() ?? '';
       }
+
+      print("User info: ${userInfo.toString()}");
     } catch (e) {
       print("🚨 Error loading or checking role: $e");
     } finally {
@@ -60,11 +67,14 @@ class _UserDetailState extends State<UserDetail> {
   Future<void> _saveUserData() async {
     if (_formKey.currentState!.validate()) {
       try {
-        await _firestore.collection('drivers').doc(widget.uid).update({
-          'first_name': _firstNameController.text.trim(),
-          'last_name': _lastNameController.text.trim(),
-          'age': int.tryParse(_ageController.text.trim()) ?? 0,
-        });
+        await _dbService.updateDriverData(
+          widget.uid,
+          {
+            'first_name': _firstNameController.text,
+            'last_name': _lastNameController.text,
+            'age': int.tryParse(_ageController.text),
+          },
+        );
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("User info updated successfully!")),
