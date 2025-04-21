@@ -41,9 +41,9 @@ class BoxPainter extends CustomPainter {
 
 
         // decode the class label
-        if(recognitions[3][0][i].toInt() == 0) object_class = "cigarette";
+        if(recognitions[3][0][i].toInt() == 0) object_class = "vape";
 
-        else if(recognitions[3][0][i].toInt() == 1) object_class = "vape";
+        else if(recognitions[3][0][i].toInt() == 1) object_class = "cigarette";
 
         else object_class = "phone";
 

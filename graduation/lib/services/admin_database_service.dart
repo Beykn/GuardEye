@@ -51,11 +51,7 @@ class AdminDatabaseService {
             .collection('violations')
             .get();
 
-          // print all info
-        snapshot.docs.forEach((doc) {
-          print("Violation ID: ${doc.id}");
-          print("Violation Data: ${doc.data()}");
-        });
+         
 
         return snapshot.docs.map((doc) {
           return Violation.fromMap(doc.id, doc.data());

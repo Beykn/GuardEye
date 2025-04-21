@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:graduation/screens/detection/live_cam.dart';
 import 'package:graduation/services/database.dart';
 

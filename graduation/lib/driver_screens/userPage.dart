@@ -8,7 +8,8 @@ import 'package:graduation/driver_screens/detection_details.dart';
 import '../userDetail.dart';
 
 class UserPage extends StatefulWidget {
-  const UserPage({super.key});
+  final String? uid;
+  const UserPage({super.key ,required this.uid});
 
   @override
   State<UserPage> createState() => _UserPageState();
@@ -22,7 +23,7 @@ class _UserPageState extends State<UserPage> {
   @override
   void initState() {
     super.initState();
-    uid = FirebaseAuth.instance.currentUser?.uid ?? '';
+    uid = widget.uid!;
     dbService = UserDatabaseService(uid: uid);
     userDataFuture = dbService.getDriverData();
   }

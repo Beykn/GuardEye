@@ -1,5 +1,5 @@
-changed the admin_detail.dart file to use the admin_database_service.dart file and not to access the database directly
-changed the userDetail.dart file to use the admin_database_service.dart file and not to access the database directly
-changed the user_route_details.dart file to use the admin_database_service.dart file and not to access the database directly
-deleted driver_routes_page.dart file cause it we already using user_route_details.dart(both files are same)
-deleted admin_route_details.dart file(there is no routes for admin and the file wasn't used)
+all the following changes were made to improve the performance of the code
+passed the uid from login to userPage so we don't need to fetch it again
+added a function to login and a loading state to the login page
+changed the _userFromFirebase in auth file to only fetch the role not the whole user
+removed trips array from getDriverData in database file so we don't need to fetch in that function, when we need it we can fetch it using the getDriverTrips functions

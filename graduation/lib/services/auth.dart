@@ -12,9 +12,9 @@ class AuthService{
   Future<MyUser?> _userFromFirebase(User? user) async {
   if (user != null) {
     _databaseService = UserDatabaseService(uid: user.uid);
-    Driver? driverData = await _databaseService.getDriverData();
-    if (driverData != null) {
-      return MyUser(uid: user.uid, role: driverData.role);
+    String? userRole = await _databaseService.getUserRole();
+    if (userRole != null) {
+      return MyUser(uid: user.uid, role: userRole);
     }
   }
   return null;
