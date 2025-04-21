@@ -21,7 +21,7 @@ class AdminPage extends StatelessWidget {
               context,
               title: "Users",
               icon: Icons.people,
-              color: Colors.blueAccent,
+              color: Color(0XFF0F4C75),
               onTap: () {
                 Navigator.pushNamed(context, "/userList");
               },
@@ -33,7 +33,7 @@ class AdminPage extends StatelessWidget {
               context,
               title: "Admin Detail",
               icon: Icons.admin_panel_settings,
-              color: Colors.greenAccent,
+              color: Color(0XFF328E6E),
               onTap: () {
                 Navigator.pushNamed(context, "/admin/detail"); 
               },
@@ -45,7 +45,7 @@ class AdminPage extends StatelessWidget {
               context,
               title: "All Records",
               icon: Icons.list_alt,
-              color: Colors.orangeAccent,
+              color: Color(0XFFEA7300),
               onTap: () {
                 Navigator.pushNamed(context, "/records"); // Kayıt sayfası (oluşturulmalı)
               },
@@ -58,7 +58,7 @@ class AdminPage extends StatelessWidget {
                 Navigator.pop(context); // Çıkış yap
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.redAccent,
+                backgroundColor: Color(0xFFBF3131),
                 padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 40),
               ),
               child: const Text(

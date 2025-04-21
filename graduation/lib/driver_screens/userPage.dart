@@ -66,48 +66,74 @@ class _UserPageState extends State<UserPage> {
 
   Widget _buildProfileCard(Driver user) {
     return Container(
-      padding: const EdgeInsets.all(20),
-      width: double.infinity,
+      padding: const EdgeInsets.all(50),
+      width: 700,
       decoration: BoxDecoration(
         color: Colors.grey.shade800,
         borderRadius: BorderRadius.circular(16),
         boxShadow: const [BoxShadow(color: Colors.black38, blurRadius: 8)],
       ),
-      child: Column(
+
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          //Avatar sol taraf
           const CircleAvatar(
-            radius: 36,
+            radius: 70,
             backgroundColor: Colors.white12,
-            child: Icon(Icons.person, color: Colors.white, size: 34),
+            child: Icon(Icons.person, color: Colors.white, size: 70),
           ),
-          const SizedBox(height: 14),
-          Text(
-            "${user.firstName} ${user.lastName}",
-            style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 6),
-          Text("Age: ${user.age}", style: const TextStyle(color: Colors.white70, fontSize: 16)),
-          const SizedBox(height: 16),
-          OutlinedButton.icon(
-            onPressed: () async {
-              final result = await Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => UserDetail(uid: uid)),
-              );
-              if (result == true) {
-                setState(() {
-                  userDataFuture = dbService.getDriverData();
-                });
-              }
-            },
-            icon: const Icon(Icons.info_outline, color: Colors.white),
-            label: const Text(
-              "Details",
-              style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
-            ),
-            style: OutlinedButton.styleFrom(
-              side: const BorderSide(color: Colors.white60),
-              foregroundColor: Colors.white,
+          const SizedBox(width: 20),
+
+          // Sağda bilgiler + buton
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "${user.firstName} ${user.lastName}",
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  "Age: ${user.age}",
+                  style: const TextStyle(color: Colors.white70, fontSize: 16),
+                ),
+                const SizedBox(height: 16),
+
+                Align(
+                  alignment: Alignment.bottomRight,
+                  child: OutlinedButton.icon(
+                    onPressed: () async {
+                      final result = await Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => UserDetail(uid: uid)),
+                      );
+                      if (result == true) {
+                        setState(() {
+                          userDataFuture = dbService.getDriverData();
+                        });
+                      }
+                    },
+                    icon: const Icon(Icons.info_outline, color: Colors.white),
+                    label: const Text(
+                      "Details",
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: Colors.white60),
+                      foregroundColor: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -116,42 +142,46 @@ class _UserPageState extends State<UserPage> {
   }
 
   Widget _buildActionColumn(Driver user) {
-    return Column(
-      children: [
-        _buildActionCard(
-          icon: FontAwesomeIcons.route,
-          label: "Routes",
-          color: Colors.blueAccent,
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => DriverTripsPage(
-                  driverId: uid,
-                  driverName: "${user.firstName} ${user.lastName}",
-                  onlyView: false,
+    return Container(
+      width:700,
+      child: Column(
+        children: [
+          _buildActionCard(
+            icon: FontAwesomeIcons.route,
+            label: "Routes",
+            color: Color(0XFF0F4C75),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => DriverTripsPage(
+                    driverId: uid,
+                    driverName: "${user.firstName} ${user.lastName}",
+                    onlyView: false,
+                  ),
                 ),
-              ),
-            );
-          },
-        ),
-        const SizedBox(height: 20),
-        _buildActionCard(
-          icon: FontAwesomeIcons.triangleExclamation,
-          label: "Detections",
-          color: Colors.deepOrange,
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ViolationDetailsPage(
-                  userDb: UserDatabaseService(uid: uid),
+              );
+            },
+          ),
+          const SizedBox(height: 20),
+          _buildActionCard(
+            icon: FontAwesomeIcons.triangleExclamation,
+            label: "Detections",
+            color: Color(0XFFBF3131),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ViolationDetailsPage(
+                    userDb: UserDatabaseService(uid: uid),
+                  ),
                 ),
-              ),
-            );
-          },
-        ),
-      ],
+              );
+            },
+          ),
+        ],
+      ),
+
     );
   }
 

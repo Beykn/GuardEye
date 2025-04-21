@@ -37,7 +37,7 @@ class _LoginPageState extends State<LoginPage> {
 
       if (isAuthenticated) {
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => UserPage()));
+            context, MaterialPageRoute(builder: (context) => const UserPage()));
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -74,130 +74,180 @@ class _LoginPageState extends State<LoginPage> {
                 const SizedBox(height: 30),
 
                 // Email field
-                TextFormField(
-                  keyboardType: TextInputType.emailAddress,
-                  onChanged: (value) => email = value,
-                  validator: (value) =>
-                  value!.isEmpty ? 'Enter an email' : null,
-                  decoration: const InputDecoration(
-                    labelText: 'Email',
-                    prefixIcon: Icon(Icons.email),
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // Password field
-                TextFormField(
-                  obscureText: _obscureText,
-                  onChanged: (value) => password = value,
-                  validator: (value) => value!.length < 6
-                      ? 'Enter a password 6+ chars long'
-                      : null,
-                  decoration: InputDecoration(
-                    labelText: 'Password',
-                    prefixIcon: const Icon(Icons.lock),
-                    border: const OutlineInputBorder(),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscureText
-                            ? Icons.visibility_off
-                            : Icons.visibility,
+                Center(
+                  child: SizedBox(
+                    width: 500,
+                    child: TextFormField(
+                      keyboardType: TextInputType.emailAddress,
+                      onChanged: (value) => email = value,
+                      validator: (value) =>
+                      value!.isEmpty ? 'Enter an email' : null,
+                      decoration: const InputDecoration(
+                        labelText: 'Email',
+                        prefixIcon: Icon(Icons.email),
+                        border: OutlineInputBorder(),
                       ),
-                      onPressed: () {
-                        setState(() {
-                          _obscureText = !_obscureText;
-                        });
-                      },
                     ),
                   ),
                 ),
+
+                const SizedBox(height: 16),
+
+                // Password field
+                Center(
+                  child: SizedBox(
+                    width: 500,
+                    child:
+                    TextFormField(
+                      obscureText: _obscureText,
+                      onChanged: (value) => password = value,
+                      validator: (value) => value!.length < 6
+                          ? 'Enter a password 6+ chars long'
+                          : null,
+                      decoration: InputDecoration(
+                        labelText: 'Password',
+                        prefixIcon: const Icon(Icons.lock),
+                        border: const OutlineInputBorder(),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscureText
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _obscureText = !_obscureText;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                  )
+
+                ),
+
                 const SizedBox(height: 30),
 
-                // Sign In
-                ElevatedButton(
-                  onPressed: () async {
-                    if (_formKey.currentState?.validate() ?? false) {
-                      dynamic result =
-                      await _firebase_auth.signInWithEmailAndPassword(
-                          email, password);
-                      if (result != null && result.role == "driver") {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const UserPage()),
-                        );
-                      } else if (result != null && result.role == "admin") {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const AdminPage()),
-                        );
-                      }
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    padding: const EdgeInsets.symmetric(vertical: 15),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8)),
+                // Sign In Button
+                Center(
+                  child: SizedBox(
+                    width: 400,
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        if (_formKey.currentState?.validate() ?? false) {
+                          dynamic result =
+                          await _firebase_auth.signInWithEmailAndPassword(
+                              email, password);
+                          if (result != null && result.role == "driver") {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const UserPage()),
+                            );
+                          } else if (result != null && result.role == "admin") {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const AdminPage()),
+                            );
+                          }
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0XFF3282B8),
+                        padding: const EdgeInsets.symmetric(vertical: 15),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8)),
+                      ),
+                      child: const Text("Sign In",
+                          style: TextStyle(fontSize: 18, color: Colors.white)),
+                    ),
                   ),
-                  child: const Text("Sign In",
-                      style: TextStyle(fontSize: 18, color: Colors.white)),
                 ),
                 const SizedBox(height: 15),
 
-                // Biometrics
-                ElevatedButton.icon(
-                  onPressed: _authenticateWithBiometrics,
-                  icon: const Icon(Icons.fingerprint),
-                  label: const Text("Use Face ID / Fingerprint"),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.indigo,
-                    padding: const EdgeInsets.symmetric(vertical: 15),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8)),
+                // Face ID / Fingerprint
+                Center(
+                  child: SizedBox(
+                    width: 400,
+                    child: ElevatedButton.icon(
+                      onPressed: _authenticateWithBiometrics,
+                      icon: const Icon(
+                         Icons.fingerprint,
+                         color: Colors.white,
+                      ),
+                      label: const Text(
+                        "Use Face ID / Fingerprint",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF0F4C75),
+                        padding: const EdgeInsets.symmetric(vertical: 15),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8)),
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 15),
 
                 // Forgot Password
-                TextButton(
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content:
-                        Text("Şifre sıfırlama işlemi yakında eklenecek."),
-                        backgroundColor: Colors.deepOrange,
-                      ),
-                    );
-                  },
-                  child: const Text(
-                    "Forgot Password?",
-                    style:
-                    TextStyle(color: Colors.deepOrange, fontSize: 14),
+                Center(
+                  child: TextButton(
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content:
+                          Text("Şifre sıfırlama işlemi yakında eklenecek."),
+                          backgroundColor: Colors.deepOrange,
+                        ),
+                      );
+                    },
+                    child: const Text(
+                      "Forgot Password?",
+                      style: TextStyle(
+                          color: Color(0xFFBF3131), fontSize: 14),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 10),
 
                 // Sign Up
-                OutlinedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => SignUpScreen()),
-                    );
-                  },
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 15),
-                    side: const BorderSide(color: Colors.blueAccent),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8)),
+
+                Center(
+                  child: Text(
+                    "Don't have an account?",
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: Colors.white,
+                    ),
                   ),
-                  child: const Text("Sign Up",
-                      style: TextStyle(
-                          color: Colors.blueAccent, fontSize: 16)),
+                ),
+
+                const SizedBox(height: 5),
+
+                Center(
+                  child: SizedBox(
+                    width: 280,
+                    child: OutlinedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>  SignUpScreen()),
+                        );
+                      },
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 15),
+                        side: const BorderSide(color: Color(0XFFBBE1FA)),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8)),
+                      ),
+                      child: const Text("Sign Up",
+                          style: TextStyle(
+                              color: Color(0XFFBBE1FA), fontSize: 16)),
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 30),
               ],
