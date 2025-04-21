@@ -20,6 +20,8 @@ class _LoginPageState extends State<LoginPage> {
   final LocalAuthentication _auth = LocalAuthentication();
   final _formKey = GlobalKey<FormState>();
   final _firebase_auth = AuthService();
+  bool isLoading = false;
+  
 
   Future<void> _authenticateWithBiometrics() async {
     bool canCheckBiometrics = await _auth.canCheckBiometrics;
@@ -36,8 +38,8 @@ class _LoginPageState extends State<LoginPage> {
       }
 
       if (isAuthenticated) {
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => const UserPage()));
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => const UserPage(uid: "tempUid")));
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -46,6 +48,37 @@ class _LoginPageState extends State<LoginPage> {
           backgroundColor: Colors.orange,
         ),
       );
+    }
+  }
+
+  Future<void> _handleLogin() async {
+    if (_formKey.currentState?.validate() ?? false) {
+      setState(() => isLoading = true);
+
+      try {
+        final result = await _firebase_auth.signInWithEmailAndPassword(email, password);
+        if (result != null && result.role == "driver") {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => UserPage(uid: result.uid)),
+          );
+        } else if (result != null && result.role == "admin") {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const AdminPage()),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Login failed, wrong username or password.")),
+          );
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Error: $e")),
+        );
+      } finally {
+        setState(() => isLoading = false);
+      }
     }
   }
 
@@ -132,36 +165,19 @@ class _LoginPageState extends State<LoginPage> {
                 Center(
                   child: SizedBox(
                     width: 400,
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        if (_formKey.currentState?.validate() ?? false) {
-                          dynamic result =
-                          await _firebase_auth.signInWithEmailAndPassword(
-                              email, password);
-                          if (result != null && result.role == "driver") {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const UserPage()),
-                            );
-                          } else if (result != null && result.role == "admin") {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const AdminPage()),
-                            );
-                          }
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0XFF3282B8),
-                        padding: const EdgeInsets.symmetric(vertical: 15),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8)),
-                      ),
-                      child: const Text("Sign In",
-                          style: TextStyle(fontSize: 18, color: Colors.white)),
-                    ),
+                    child: isLoading
+    ? const Center(child: CircularProgressIndicator())
+    : ElevatedButton(
+        onPressed: _handleLogin,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0XFF3282B8),
+          padding: const EdgeInsets.symmetric(vertical: 15),
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8)),
+        ),
+        child: const Text("Sign In",
+            style: TextStyle(fontSize: 18, color: Colors.white)),
+      ),
                   ),
                 ),
                 const SizedBox(height: 15),
@@ -231,7 +247,7 @@ class _LoginPageState extends State<LoginPage> {
                     width: 280,
                     child: OutlinedButton(
                       onPressed: () {
-                        Navigator.push(
+                        Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
                               builder: (context) =>  SignUpScreen()),

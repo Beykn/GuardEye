@@ -22,7 +22,6 @@ class UserDatabaseService {
     });
   }
 
-  // Add a trip for the user (driver)
   
 
   // Get trips for the user (driver)
@@ -70,6 +69,21 @@ class UserDatabaseService {
     }
   }
 
+  Future<String> getUserRole() async {
+    try {
+      DocumentSnapshot snapshot = await _driverCollection.doc(uid).get();
+      if (snapshot.exists) {
+        Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+        return data['role'] ?? '';
+      } else {
+        return '';
+      }
+    } catch (e) {
+      print("Error fetching user role: $e");
+      return '';
+    }
+  }
+
 
   // Get user data (driver)
   Future<Driver?> getDriverData() async {
@@ -78,7 +92,6 @@ class UserDatabaseService {
 
       if (snapshot.exists) {
         Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
-        List<Map<String, dynamic>> trips = await _getTripsFromFirestore();
 
         return Driver(
           firstName: data['first_name'] ?? '',
@@ -86,7 +99,7 @@ class UserDatabaseService {
           age: int.tryParse(data['age'].toString()) ?? 0,
           role: data['role'] ?? '',
           UID: snapshot.id,
-          trips: trips,
+          trips: [],
         );
       } else {
         return null;
@@ -97,24 +110,5 @@ class UserDatabaseService {
     }
   }
 
-  Future<List<Map<String, dynamic>>> _getTripsFromFirestore() async {
-    try {
-      QuerySnapshot snapshot = await _firestore
-          .collection('drivers')
-          .doc(uid)
-          .collection('trips')
-          .get();
-
-      return snapshot.docs.map((doc) => {
-        'id': doc.id,
-        'startingPoint': doc['startingPoint'],
-        'endingPoint': doc['endingPoint'],
-        'date': doc['date'],
-        'hours': doc['hours'],
-      }).toList();
-    } catch (e) {
-      print('Error fetching trips: $e');
-      return [];
-    }
-  }
+  
 }
