@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:graduation/inner_services/add_trip_dialog.dart';
 import 'package:graduation/services/admin_database_service.dart';
-class DriverDetailPage extends StatelessWidget {
+class DriverRoutesPage extends StatelessWidget {
   final String driverId;
   final String driverName;
 
-  const DriverDetailPage({
+  const DriverRoutesPage({
     super.key,
     required this.driverId,
     required this.driverName,

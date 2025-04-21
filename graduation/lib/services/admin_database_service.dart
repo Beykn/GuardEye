@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:graduation/models/userInfo.dart';
+import 'package:graduation/models/violation.dart';
 
 class AdminDatabaseService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -41,6 +42,45 @@ class AdminDatabaseService {
       return Stream.empty(); // Return an empty stream in case of error
     }
   }
+
+    Future<List<Violation>> getDriverViolations(String driverId) async {
+      try {
+        final snapshot = await _firestore
+            .collection('drivers')
+            .doc(driverId)
+            .collection('violations')
+            .get();
+
+          // print all info
+        snapshot.docs.forEach((doc) {
+          print("Violation ID: ${doc.id}");
+          print("Violation Data: ${doc.data()}");
+        });
+
+        return snapshot.docs.map((doc) {
+          return Violation.fromMap(doc.id, doc.data());
+        }).toList();
+      } catch (e) {
+        print("Error fetching violations: $e");
+        return [];
+      }
+    }
+
+    // delete a violation
+    Future<void> deleteViolation(String driverId, String violationId) async{
+      try {
+        await _firestore
+            .collection('drivers')
+            .doc(driverId)
+            .collection('violations')
+            .doc(violationId)
+            .delete();
+      } catch (e) {
+        print("Error deleting violation: $e");
+        rethrow;
+      }
+    }
+
 
   Future<void> addTripToDriver(String uid,Map<String, dynamic> tripData) async {
     try {

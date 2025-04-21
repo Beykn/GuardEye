@@ -1,0 +1,4 @@
+i've merged main with the design branch, there was some conflicts in user_list_page and i resolved them
+
+i moved AddDriverPage class from user_list_page.dart to add_driver_page.dart(i created a seprate file for it)
+i moved AdminDriverOverviewPage class from user_list_page.dart to driver_options_page.dart and changed the name of the class to DriverOptionsPage

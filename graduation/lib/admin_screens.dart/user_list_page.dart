@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:graduation/models/userInfo.dart';
 import 'package:graduation/services/admin_database_service.dart';
-import 'package:graduation/userDetail.dart';
-import 'package:graduation/driver_screens/driver_trips_page.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:uuid/uuid.dart';
+import 'package:graduation/admin_screens.dart/add_driver.dart';
+import 'package:graduation/admin_screens.dart/driver_options_page.dart';
+
 
 class UserListPage extends StatefulWidget {
   const UserListPage({super.key});
@@ -85,7 +84,8 @@ class _UserListPageState extends State<UserListPage> {
                         context,
                         MaterialPageRoute(
                           builder: (context) =>
-                              AdminDriverOverviewPage(driverId: driver.UID),
+                              DriverOptionsPage(driverId: driver.UID,
+                                  driverName: "${driver.firstName} ${driver.lastName}"),
                         ),
                       );
                     },
@@ -100,131 +100,5 @@ class _UserListPageState extends State<UserListPage> {
   }
 }
 
-class AddDriverPage extends StatefulWidget {
-  const AddDriverPage({super.key});
 
-  @override
-  State<AddDriverPage> createState() => _AddDriverPageState();
-}
 
-class _AddDriverPageState extends State<AddDriverPage> {
-  final _formKey = GlobalKey<FormState>();
-  final _firestore = FirebaseFirestore.instance;
-
-  final _firstNameController = TextEditingController();
-  final _lastNameController = TextEditingController();
-  final _ageController = TextEditingController();
-
-  bool _isSaving = false;
-
-  Future<void> _saveDriver() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    setState(() => _isSaving = true);
-
-    final String uid = const Uuid().v4();
-
-    await _firestore.collection('drivers').doc(uid).set({
-      'first_name': _firstNameController.text.trim(),
-      'last_name': _lastNameController.text.trim(),
-      'age': int.tryParse(_ageController.text.trim()) ?? 0,
-      'role': 'driver',
-      'id': uid,
-      'trips': [],
-    });
-
-    setState(() => _isSaving = false);
-    Navigator.pop(context, true); // başarılı ekleme sonrası geri dön
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Add New Driver")),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              TextFormField(
-                controller: _firstNameController,
-                decoration: const InputDecoration(labelText: 'First Name'),
-                validator: (value) => value!.isEmpty ? 'Required' : null,
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: _lastNameController,
-                decoration: const InputDecoration(labelText: 'Last Name'),
-                validator: (value) => value!.isEmpty ? 'Required' : null,
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: _ageController,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(labelText: 'Age'),
-                validator: (value) =>
-                int.tryParse(value!) == null ? 'Enter valid number' : null,
-              ),
-              const SizedBox(height: 24),
-              ElevatedButton.icon(
-                onPressed: _isSaving ? null : _saveDriver,
-                icon: const Icon(Icons.save),
-                label: Text(_isSaving ? "Saving..." : "Add Driver"),
-              )
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class AdminDriverOverviewPage extends StatelessWidget {
-  final String driverId;
-  const AdminDriverOverviewPage({super.key, required this.driverId});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Driver Options")),
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ElevatedButton.icon(
-              icon: const Icon(Icons.info_outline),
-              label: const Text("Driver Detail"),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => UserDetail(uid: driverId),
-                  ),
-                );
-              },
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton.icon(
-              icon: const Icon(Icons.route),
-              label: const Text("Trip List"),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => DriverTripsPage(
-                      driverId: driverId,
-                      driverName: "Driver",
-                      onlyView: true,
-                    ),
-                  ),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
