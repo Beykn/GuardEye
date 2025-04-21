@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:graduation/inner_services/add_trip_dialog.dart';
+import 'package:graduation/services/admin_database_service.dart';
 
 class DriverDetailPage extends StatelessWidget {
   final String driverId;
@@ -14,17 +15,14 @@ class DriverDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tripsRef = FirebaseFirestore.instance
-        .collection('drivers')
-        .doc(driverId)
-        .collection('trips');
+    final _dbServices = AdminDatabaseService();
 
     return Scaffold(
       appBar: AppBar(
         title: Text('$driverName\'s Trips'),
       ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: tripsRef.orderBy('createdAt', descending: true).snapshots(),
+      body: FutureBuilder<List<Map<String, dynamic>>>(
+        future: _dbServices.getTripsFromFirestore(driverId),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return const Center(child: Text("Error loading trips"));
@@ -34,7 +32,7 @@ class DriverDetailPage extends StatelessWidget {
             return const Center(child: CircularProgressIndicator());
           }
 
-          final trips = snapshot.data!.docs;
+          final trips = snapshot.data ?? [];
 
           if (trips.isEmpty) {
             return const Center(child: Text("No trips yet."));
@@ -43,8 +41,8 @@ class DriverDetailPage extends StatelessWidget {
           return ListView.builder(
             itemCount: trips.length,
             itemBuilder: (context, index) {
-              final trip = trips[index].data() as Map<String, dynamic>;
-              final tripId = trips[index].id; // Get the trip ID
+              final trip = trips[index];
+              final tripId = trip['id']; // Already included by your method
 
               return ListTile(
                 leading: const Icon(Icons.directions_bus),
@@ -56,13 +54,12 @@ class DriverDetailPage extends StatelessWidget {
                     IconButton(
                       icon: const Icon(Icons.edit),
                       onPressed: () async {
-                        // Show Edit Trip dialog
                         showDialog(
                           context: context,
                           builder: (_) => AddTripDialog(
                             driverId: driverId,
-                            tripId: tripId, // Pass trip ID to the dialog
-                            existingTripData: trip, // Pass existing trip data
+                            tripId: tripId,
+                            existingTripData: trip,
                           ),
                         );
                       },
@@ -70,12 +67,15 @@ class DriverDetailPage extends StatelessWidget {
                     IconButton(
                       icon: const Icon(Icons.delete),
                       onPressed: () async {
-                        // Delete the trip from Firestore
                         try {
-                          await tripsRef.doc(tripId).delete();
+                          await _dbServices.deleteTrip(driverId, tripId);
+
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(content: Text("Trip deleted successfully")),
                           );
+
+                          // Force rebuild after deletion
+                          (context as Element).reassemble();
                         } catch (e) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(content: Text("Error deleting trip")),
@@ -91,8 +91,7 @@ class DriverDetailPage extends StatelessWidget {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          // Show Add Trip dialog for adding a new trip
+        onPressed: () {
           showDialog(
             context: context,
             builder: (_) => AddTripDialog(driverId: driverId),
