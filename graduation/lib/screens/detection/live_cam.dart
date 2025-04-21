@@ -158,11 +158,12 @@ class _LiveCamState extends State<LiveCam> with WidgetsBindingObserver {
         if (confidence > 0.4) {
           final int classIndex = recognitions[3][0][i].toInt();
           String label = switch (classIndex) {
-            0 => 'cigarette',
-            1 => 'phone',
-            2 => 'vape',
+            0 => 'vape',
+            1 => 'cigarette',
+            2 => 'phone',
             _ => 'unknown'
           };
+          print('Detected $label with confidence: ${(confidence * 100).toStringAsFixed(1)}%');
 
           // Only process this detection if it passes our cooldown filter
           if (_shouldProcessDetection(label)) {

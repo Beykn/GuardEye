@@ -36,6 +36,22 @@ class _AddTripDialogState extends State<AddTripDialog> {
     }
   }
 
+  Future<void> _selectDate() async {
+    DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+    );
+
+    if (pickedDate != null) {
+      setState(() {
+        _dateController.text = "${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}";
+      });
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -53,7 +69,12 @@ class _AddTripDialogState extends State<AddTripDialog> {
           ),
           TextField(
             controller: _dateController,
-            decoration: const InputDecoration(labelText: "Date"),
+            readOnly: true,
+            onTap: _selectDate,
+            decoration: const InputDecoration(
+              labelText: "Date",
+              suffixIcon: Icon(Icons.calendar_today),
+            ),
           ),
           TextField(
             controller: _hoursController,
