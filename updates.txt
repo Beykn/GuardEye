@@ -1,5 +1,1 @@
-all the following changes were made to improve the performance of the code
-passed the uid from login to userPage so we don't need to fetch it again
-added a function to login and a loading state to the login page
-changed the _userFromFirebase in auth file to only fetch the role not the whole user
-removed trips array from getDriverData in database file so we don't need to fetch in that function, when we need it we can fetch it using the getDriverTrips functions
+fixed the live_cam file, now we only upload violations with 3 consecutive frames and we have a 7 seconds gap between them

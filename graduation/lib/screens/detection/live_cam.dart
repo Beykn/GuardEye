@@ -12,7 +12,6 @@ import 'package:graduation/models/violation.dart';
 
 late List<CameraDescription> cameras;
 
-// Use the existing Violation model for the queue
 class PendingViolation {
   final Violation violation;
   final CameraImage image;
@@ -21,6 +20,34 @@ class PendingViolation {
     required this.violation,
     required this.image,
   });
+}
+
+class DetectionTracker {
+  final String type;
+  int consecutiveFrames = 1;
+  final double confidence;
+  DateTime firstDetected;
+  bool violationReported = false;
+  CameraImage? imageToUse;
+  
+  DetectionTracker({
+    required this.type,
+    required this.confidence,
+    this.imageToUse,
+    DateTime? detectedAt,
+  }) : firstDetected = detectedAt ?? DateTime.now();
+  
+  void incrementFrameCount(CameraImage image) {
+    consecutiveFrames++;
+    if (consecutiveFrames == 3 && !violationReported) {
+      imageToUse = image;
+    }
+  }
+  
+  bool isStale(DateTime now) {
+    // Consider detection stale if more than 500ms has passed with no updates
+    return now.difference(firstDetected).inMilliseconds > 500;
+  }
 }
 
 class LiveCam extends StatefulWidget {
@@ -44,14 +71,32 @@ class _LiveCamState extends State<LiveCam> with WidgetsBindingObserver {
   // Queue to store detected violations
   final Queue<PendingViolation> _violationsQueue = Queue<PendingViolation>();
   bool _isProcessingViolations = false;
+  bool _isCheckingViolations = false;
 
-  // Map to track last detection time for each type
-  final Map<String, DateTime> _lastDetectionTimes = {};
-  // Duration to wait before allowing another detection of the same type
-  final Duration _detectionCooldown = const Duration(seconds: 3);
+  // Track detections across consecutive frames
+  final Map<String, DetectionTracker> _activeDetections = {};
+  
+  // A separate list to track violation types that need to be checked
+  final Set<String> _detectionsToCheck = {};
+  
+  // Number of consecutive frames required to confirm a violation
+  final int _requiredConsecutiveFrames = 3;
+  
+  // Time between violation checks
+  final Duration _violationCheckDelay = const Duration(milliseconds: 100);
 
   late final UserDatabaseService _userDb;
   late final ViolationHandler _violationHandler;
+
+  int _frameCount = 0;
+  int _lastFpsTime = DateTime.now().millisecondsSinceEpoch;
+  double _inputFps = 0.0;
+  
+  // Minimal time gap between two violation uploads of the same type
+  final Duration _violationCooldown = const Duration(seconds: 7);
+  
+  // Stores last upload time for each violation type
+  final Map<String, DateTime> _lastUploadTimes = {};
 
   @override
   void initState() {
@@ -106,6 +151,9 @@ class _LiveCamState extends State<LiveCam> with WidgetsBindingObserver {
       
       // Start processing queue in background
       _processViolationsQueue();
+      
+      // Start checking for violations in background
+      _startViolationChecking();
     } catch (e) {
       print('Error initializing camera: $e');
     }
@@ -124,33 +172,124 @@ class _LiveCamState extends State<LiveCam> with WidgetsBindingObserver {
     await _initializeCamera();
   }
 
-  // Check if a detection should be processed based on type and timing
-  bool _shouldProcessDetection(String type) {
+  // Clean up stale detections that haven't been updated recently
+  void _cleanStaleDetections() {
     final now = DateTime.now();
+    final staleKeys = <String>[];
     
-    // Check if we've seen this type before
-    if (_lastDetectionTimes.containsKey(type)) {
-      final lastDetection = _lastDetectionTimes[type]!;
-      
-      // If the cooldown period hasn't elapsed, skip this detection
-      if (now.difference(lastDetection) < _detectionCooldown) {
-        print('🕒 Skipping $type detection - cooldown period active (${now.difference(lastDetection).inSeconds}s)');
-        return false;
+    _activeDetections.forEach((key, tracker) {
+      if (tracker.isStale(now)) {
+        staleKeys.add(key);
       }
+    });
+    
+    for (final key in staleKeys) {
+      _activeDetections.remove(key);
     }
     
-    // Update the last detection time for this type
-    _lastDetectionTimes[type] = now;
-    return true;
+    if (staleKeys.isNotEmpty) {
+      print('🧹 Cleaned up ${staleKeys.length} stale detections');
+    }
+  }
+
+  // Start a background task to periodically check for violations
+  void _startViolationChecking() async {
+    while (mounted) {
+      await Future.delayed(_violationCheckDelay);
+      if (_detectionsToCheck.isNotEmpty && !_isCheckingViolations) {
+        await _checkForViolations();
+      }
+    }
+  }
+
+  // Check for violations that have reached threshold and queue them (just once)
+  Future<void> _checkForViolations() async {
+    if (_isCheckingViolations) return;
+    _isCheckingViolations = true;
+    
+    try {
+      // Create a copy to avoid concurrent modification
+      final detectionTypes = Set<String>.from(_detectionsToCheck);
+      _detectionsToCheck.clear();
+      
+      for (final type in detectionTypes) {
+        if (_activeDetections.containsKey(type)) {
+          final tracker = _activeDetections[type]!;
+          
+          // Check if we've reached threshold, haven't reported this yet,
+          // and aren't in cooldown period
+          if (tracker.consecutiveFrames >= _requiredConsecutiveFrames && 
+              !tracker.violationReported &&
+              tracker.imageToUse != null) {
+            
+            final now = DateTime.now();
+            
+            // Check if we're in the cooldown period
+            if (_lastUploadTimes.containsKey(type)) {
+              final timeSinceLastUpload = now.difference(_lastUploadTimes[type]!);
+              if (timeSinceLastUpload < _violationCooldown) {
+                print('⏳ Skipping $type upload - in cooldown period (${timeSinceLastUpload.inSeconds}s/${_violationCooldown.inSeconds}s)');
+                continue;
+              }
+            }
+            
+            // Mark as reported
+            tracker.violationReported = true;
+            
+            // Update last upload time
+            _lastUploadTimes[type] = now;
+            
+            // Create a Violation object
+            final violation = Violation(
+              id: 'temp', // Generate a unique ID
+              type: type,
+              timestamp: now,
+              confidence: tracker.confidence,
+              imageBase64: null, // We'll set this later after processing
+            );
+
+            // Add to queue for processing
+            _violationsQueue.add(PendingViolation(
+              violation: violation,
+              image: tracker.imageToUse!,
+            ));
+            
+            print('✅ Added $type violation to queue after ${_requiredConsecutiveFrames} consecutive frames '
+                '(confidence: ${(tracker.confidence * 100).toStringAsFixed(1)}%)');
+          }
+        }
+      }
+    } catch (e) {
+      print('Error checking for violations: $e');
+    } finally {
+      _isCheckingViolations = false;
+    }
   }
 
   Future<void> _processCameraImage(CameraImage image) async {
     if (_isDetecting) return;
+
+    _frameCount++;
+    int currentTime = DateTime.now().millisecondsSinceEpoch;
+    if (currentTime - _lastFpsTime >= 1000) {
+      setState(() {
+        _inputFps = _frameCount * 1000 / (currentTime - _lastFpsTime);
+      });
+      _frameCount = 0;
+      _lastFpsTime = currentTime;
+    }
+
     _isDetecting = true;
 
     try {
+      // Clean up stale detections before processing new ones
+      _cleanStaleDetections();
+      
       final recognitions = await _detectionService.predictCameraImage(image);
       final int numDetections = recognitions![2][0].toInt();
+      
+      // Track which detection types were found in this frame
+      final Set<String> currentFrameDetections = {};
 
       for (int i = 0; i < numDetections; i++) {
         final double confidence = recognitions[0][0][i];
@@ -163,28 +302,36 @@ class _LiveCamState extends State<LiveCam> with WidgetsBindingObserver {
             2 => 'phone',
             _ => 'unknown'
           };
-          print('Detected $label with confidence: ${(confidence * 100).toStringAsFixed(1)}%');
-
-          // Only process this detection if it passes our cooldown filter
-          if (_shouldProcessDetection(label)) {
-            // Create a Violation object using your model
-            final violation = Violation(
-              id: 'temp', // Generate a unique ID
-              type: label,
-              timestamp: DateTime.now(),
+          
+          currentFrameDetections.add(label);
+          
+          // Add this type to the list to check for violations later
+          _detectionsToCheck.add(label);
+          
+          // Update or create tracking for this detection
+          if (_activeDetections.containsKey(label)) {
+            // We've seen this before, increment frame counter
+            _activeDetections[label]!.incrementFrameCount(image);
+          } else {
+            // First time we've seen this detection in recent frames
+            _activeDetections[label] = DetectionTracker(
+              type: label, 
               confidence: confidence,
-              imageBase64: null, // We'll set this later after processing
             );
-
-            // Add to queue instead of processing immediately
-            _violationsQueue.add(PendingViolation(
-              violation: violation,
-              image: image,
-            ));
-            
-            print('✅ Added $label violation to queue (confidence: ${(confidence * 100).toStringAsFixed(1)}%)');
           }
         }
+      }
+      
+      // Remove detections that weren't found in this frame
+      final missingDetections = <String>[];
+      _activeDetections.forEach((key, tracker) {
+        if (!currentFrameDetections.contains(key)) {
+          missingDetections.add(key);
+        }
+      });
+      
+      for (final key in missingDetections) {
+        _activeDetections.remove(key);
       }
 
       if (mounted) {
@@ -322,7 +469,7 @@ class _LiveCamState extends State<LiveCam> with WidgetsBindingObserver {
               ),
             ),
           Positioned(
-            bottom: 20,
+            bottom: 60,
             left: 20,
             child: Container(
               padding: const EdgeInsets.all(8),
@@ -331,7 +478,7 @@ class _LiveCamState extends State<LiveCam> with WidgetsBindingObserver {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
-                'FPS: ${(1000 / (DateTime.now().millisecondsSinceEpoch - _lastProcessingTime)).toStringAsFixed(1)}',
+                'Input FPS: ${_inputFps.toStringAsFixed(1)}',
                 style: const TextStyle(color: Colors.white),
               ),
             ),
@@ -342,6 +489,19 @@ class _LiveCamState extends State<LiveCam> with WidgetsBindingObserver {
             right: 20,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                _buildDetectionProgressIndicator('phone'),
+                _buildDetectionProgressIndicator('cigarette'),
+                _buildDetectionProgressIndicator('vape'),
+              ],
+            ),
+          ),
+          // Add cooldown indicators
+          Positioned(
+            bottom: 100,
+            left: 20,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildCooldownIndicator('phone'),
                 _buildCooldownIndicator('cigarette'),
@@ -366,17 +526,17 @@ class _LiveCamState extends State<LiveCam> with WidgetsBindingObserver {
     );
   }
   
-  // Visual indicator showing cooldown status for each violation type
-  Widget _buildCooldownIndicator(String type) {
-    bool isInCooldown = false;
-    int remainingSeconds = 0;
+  // Visual indicator showing progress toward consecutive frames
+  Widget _buildDetectionProgressIndicator(String type) {
+    int currentFrameCount = 0;
+    double progress = 0.0;
+    bool reported = false;
     
-    if (_lastDetectionTimes.containsKey(type)) {
-      final elapsed = DateTime.now().difference(_lastDetectionTimes[type]!);
-      if (elapsed < _detectionCooldown) {
-        isInCooldown = true;
-        remainingSeconds = (_detectionCooldown.inSeconds - elapsed.inSeconds);
-      }
+    if (_activeDetections.containsKey(type)) {
+      final tracker = _activeDetections[type]!;
+      currentFrameCount = tracker.consecutiveFrames;
+      progress = currentFrameCount / _requiredConsecutiveFrames;
+      reported = tracker.violationReported;
     }
     
     return Padding(
@@ -395,23 +555,60 @@ class _LiveCamState extends State<LiveCam> with WidgetsBindingObserver {
               style: const TextStyle(color: Colors.white, fontSize: 12),
             ),
             const SizedBox(width: 6),
-            Container(
-              width: 8,
+            SizedBox(
+              width: 30,
               height: 8,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: isInCooldown ? Colors.red : Colors.green,
-              ),
-            ),
-            if (isInCooldown)
-              Padding(
-                padding: const EdgeInsets.only(left: 4.0),
-                child: Text(
-                  '${remainingSeconds}s',
-                  style: const TextStyle(color: Colors.white, fontSize: 10),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: LinearProgressIndicator(
+                  value: progress,
+                  backgroundColor: Colors.grey.shade700,
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    reported ? Colors.green : (progress >= 1.0 ? Colors.red : Colors.amber),
+                  ),
                 ),
               ),
+            ),
+            const SizedBox(width: 4),
+            Text(
+              reported ? '✓' : '$currentFrameCount/$_requiredConsecutiveFrames',
+              style: const TextStyle(color: Colors.white, fontSize: 10),
+            ),
           ],
+        ),
+      ),
+    );
+  }
+  
+  // Visual indicator for cooldown status
+  Widget _buildCooldownIndicator(String type) {
+    bool inCooldown = false;
+    int remainingSeconds = 0;
+    
+    if (_lastUploadTimes.containsKey(type)) {
+      final elapsed = DateTime.now().difference(_lastUploadTimes[type]!);
+      if (elapsed < _violationCooldown) {
+        inCooldown = true;
+        remainingSeconds = (_violationCooldown.inSeconds - elapsed.inSeconds);
+      }
+    }
+    
+    // Only show if in cooldown
+    if (!inCooldown) {
+      return const SizedBox.shrink();
+    }
+    
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2.0),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+        decoration: BoxDecoration(
+          color: Colors.black54,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Text(
+          '$type: cooldown ${remainingSeconds}s',
+          style: const TextStyle(color: Colors.white, fontSize: 10),
         ),
       ),
     );
