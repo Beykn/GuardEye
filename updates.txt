@@ -1,1 +1,6 @@
-fixed the live_cam file, now we only upload violations with 3 consecutive frames and we have a 7 seconds gap between them
+i've updated the violations page for the admin panel, i've added some spaces between the cards and fixed the overflow for the delete button
+i've added categories for the trips('Upcoming', 'Finished', 'All'), and now the driver can filter them and choose from the trips page
+i've added end trip button, it will end the trip and add start and end time and the duration of the trip
+
+TO DO:
+the live_cam file is messy, it has a lot of code in it, refactor it

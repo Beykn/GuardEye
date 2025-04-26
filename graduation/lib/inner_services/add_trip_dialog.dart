@@ -97,6 +97,7 @@ class _AddTripDialogState extends State<AddTripDialog> {
               'endingPoint': _endingPointController.text,
               'date': _dateController.text,
               'hours': int.tryParse(_hoursController.text) ?? 0,
+              'status': 'Upcoming',
               'createdAt': FieldValue.serverTimestamp(),
             };
 
