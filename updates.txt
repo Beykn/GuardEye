@@ -1,6 +1,9 @@
-i've updated the violations page for the admin panel, i've added some spaces between the cards and fixed the overflow for the delete button
-i've added categories for the trips('Upcoming', 'Finished', 'All'), and now the driver can filter them and choose from the trips page
-i've added end trip button, it will end the trip and add start and end time and the duration of the trip
+this is just a temprary commit, i'll update it soon cause it is not finished yet(there is some problems with it)
+i've added exit button to admin and driver
+i've removed sign up button and its code from login page
 
-TO DO:
-the live_cam file is messy, it has a lot of code in it, refactor it
+you need to fix the trips from the admin panel cause they look bad
+
+problems you need to fix:
+start time is null, you need to make it data and time
+end time is looks too long so you need to make at same format as start time

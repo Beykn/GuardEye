@@ -6,6 +6,7 @@ import 'package:graduation/services/database.dart';
 import 'package:graduation/models/userInfo.dart';
 import 'package:graduation/driver_screens/detection_details.dart';
 import '../userDetail.dart';
+import 'package:graduation/screens/loginPage.dart';
 
 class UserPage extends StatefulWidget {
   final String? uid;
@@ -143,48 +144,77 @@ class _UserPageState extends State<UserPage> {
   }
 
   Widget _buildActionColumn(Driver user) {
-    return Container(
-      width:700,
-      child: Column(
-        children: [
-          _buildActionCard(
-            icon: FontAwesomeIcons.route,
-            label: "Routes",
-            color: Color(0XFF0F4C75),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => DriverTripsPage(
-                    driverId: uid,
-                    driverName: "${user.firstName} ${user.lastName}",
-                    onlyView: false,
-                  ),
+  return Container(
+    width: 700,
+    child: Column(
+      children: [
+        _buildActionCard(
+          icon: FontAwesomeIcons.route,
+          label: "Routes",
+          color: Color(0XFF0F4C75),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => DriverTripsPage(
+                  driverId: uid,
+                  driverName: "${user.firstName} ${user.lastName}",
+                  onlyView: false,
                 ),
-              );
-            },
-          ),
-          const SizedBox(height: 20),
-          _buildActionCard(
-            icon: FontAwesomeIcons.triangleExclamation,
-            label: "Detections",
-            color: Color(0XFFBF3131),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ViolationDetailsPage(
-                    userDb: UserDatabaseService(uid: uid),
-                  ),
+              ),
+            );
+          },
+        ),
+        const SizedBox(height: 20),
+        _buildActionCard(
+          icon: FontAwesomeIcons.triangleExclamation,
+          label: "Detections",
+          color: Color(0XFFBF3131),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ViolationDetailsPage(
+                  userDb: UserDatabaseService(uid: uid),
                 ),
-              );
-            },
-          ),
-        ],
-      ),
+              ),
+            );
+          },
+        ),
+        const SizedBox(height: 30),
 
-    );
-  }
+        // Exit Button - AdminPanel Style
+        ElevatedButton(
+          onPressed: () {
+            // Navigate to LoginPage
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const LoginPage()),
+            );
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Color(0xFFBF3131),
+            padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 40), // Same as in AdminPage
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12), // Match the rounded corners
+            ),
+            elevation: 5, // Add a slight elevation to match the look of the Admin Panel button
+          ),
+          child: const Text(
+            "Exit",
+            style: TextStyle(
+              fontSize: 18, // Same text size as in AdminPage
+              fontWeight: FontWeight.bold, // Match the font weight
+              color: Colors.white, // White text color
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+
 
   Widget _buildActionCard({
     required IconData icon,
