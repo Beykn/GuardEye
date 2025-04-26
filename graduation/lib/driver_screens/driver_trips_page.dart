@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:graduation/screens/detection/live_cam.dart';
+import 'package:graduation/detection/live_cam.dart';
 import 'package:graduation/services/database.dart';
 
 class DriverTripsPage extends StatefulWidget {
@@ -68,6 +68,7 @@ class _DriverTripsPageState extends State<DriverTripsPage> {
   }
 
   @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -104,21 +105,61 @@ class _DriverTripsPageState extends State<DriverTripsPage> {
 
                     return GestureDetector(
                       onTap: () {
+                        if (trip['status'] == 'Finished') {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('This trip is finished.')),
+                          );
+                          return;
+                        }
+
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => LiveCam(uid: widget.driverId, tripId: trip['tripId'],),
+                            builder: (context) => LiveCam(
+                              uid: widget.driverId,
+                              tripId: trip['tripId'],
+                            ),
                           ),
                         );
                       },
-                      child: ListTile(
-                        leading: const Icon(Icons.directions_bus),
-                        title: Text('${trip['startingPoint']} ➡ ${trip['endingPoint']}'),
-                        subtitle: Text('Date: ${trip['date']} - Hours: ${trip['hours']}'),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                        child: Card(
+                          elevation: 3,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    const Icon(Icons.directions_bus, color: Colors.blue),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        '${trip['startingPoint']} ➡ ${trip['endingPoint']}',
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                Text('Date: ${trip['date']} - Estamited Time: ${trip['hours']}'),
+                              ],
+                            ),
+                          ),
+                        ),
                       ),
                     );
                   },
                 ),
     );
   }
+
 }

@@ -64,6 +64,7 @@ class _driverDetailPageState extends State<DriverDetailPage> {
   }
 
   @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -77,7 +78,7 @@ class _driverDetailPageState extends State<DriverDetailPage> {
                   value: _selectedFilter,
                   onChanged: (value) {
                     if (value != null) {
-                      _filterTrips(value, _selectedStatus); // Update filter
+                      _filterTrips(value, _selectedStatus);
                     }
                   },
                   underline: const SizedBox(),
@@ -104,54 +105,79 @@ class _driverDetailPageState extends State<DriverDetailPage> {
                     final trip = _filteredTrips[index];
                     final tripId = trip['tripId'];
 
-                    return ListTile(
-                      leading: const Icon(Icons.directions_bus),
-                      title: Text('${trip['startingPoint']} ➡ ${trip['endingPoint']}'),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Date: ${trip['date']} - Hours: ${trip['hours']}'),
-                          // Check if the trip status is "Finished" and display additional attributes
-                          if (trip['status'] == 'Finished') ...[
-                            Text('Start Time: ${trip['startTime']}'),
-                            Text('End Time: ${trip['endTime']}'),
-                            Text('Duration: ${trip['duration']}'),
-                          ],
-                        ],
-                      ),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.edit),
-                            onPressed: () async {
-                              showDialog(
-                                context: context,
-                                builder: (_) => AddTripDialog(
-                                  driverId: widget.driverId,
-                                  tripId: tripId,
-                                  existingTripData: trip,
-                                ),
-                              );
-                            },
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                      child: Card(
+                        elevation: 3,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  const Icon(Icons.directions_bus, color: Colors.blue),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      '${trip['startingPoint']} ➡ ${trip['endingPoint']}',
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      IconButton(
+                                        icon: const Icon(Icons.edit, color: Colors.green),
+                                        onPressed: () async {
+                                          showDialog(
+                                            context: context,
+                                            builder: (_) => AddTripDialog(
+                                              driverId: widget.driverId,
+                                              tripId: tripId,
+                                              existingTripData: trip,
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(Icons.delete, color: Colors.red),
+                                        onPressed: () async {
+                                          try {
+                                            await _dbService.deleteTrip(widget.driverId, tripId);
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              const SnackBar(content: Text("Trip deleted successfully")),
+                                            );
+                                            _fetchTrips();
+                                          } catch (e) {
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              const SnackBar(content: Text("Error deleting trip")),
+                                            );
+                                          }
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 8),
+                              Text('Date: ${trip['date']}'),
+                              Text('Estimated Time: ${trip['hours']}'),
+                              if (trip['status'] == 'Finished') ...[
+                                const SizedBox(height: 4),
+                                Text('Start Time: ${trip['startTime']}'),
+                                Text('End Time: ${trip['endTime']}'),
+                                Text('Duration: ${trip['duration']}'),
+                              ],
+                            ],
                           ),
-                          IconButton(
-                            icon: const Icon(Icons.delete),
-                            onPressed: () async {
-                              try {
-                                await _dbService.deleteTrip(widget.driverId, tripId);
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text("Trip deleted successfully")),
-                                );
-                                _fetchTrips(); // Refresh the list after deletion
-                              } catch (e) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text("Error deleting trip")),
-                                );
-                              }
-                            },
-                          ),
-                        ],
+                        ),
                       ),
                     );
                   },

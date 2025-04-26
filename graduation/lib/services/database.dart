@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:graduation/models/userInfo.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:intl/intl.dart';
 
 
 class UserDatabaseService {
@@ -28,13 +29,17 @@ class UserDatabaseService {
   // end trip
   Future<void> endTrip(String tripId, DateTime startTime) async {
     try {
+      final now = DateTime.now();
+      final formatter = DateFormat('yyyy-MM-dd HH:mm'); // This formats only date + hour:min
+
       await _firestore.collection('drivers').doc(uid).collection('trips').doc(tripId).update({
         'status': 'Finished',
-        'startTime': startTime,
-        'endTime': DateTime.now(),
-        'duration': DateTime.now().difference(startTime).inHours.toString() + ':' + DateTime.now().difference(startTime).inMinutes.remainder(60).toString(),
+        'endTime': formatter.format(now),
+        'startTime': formatter.format(startTime),
+        'duration': '${now.difference(startTime).inHours}:${now.difference(startTime).inMinutes.remainder(60).toString().padLeft(2, '0')}',
       });
-      print('Trip ended successfully');
+
+      print('start time: ${formatter.format(startTime)}');
     } catch (e) {
       print('Error ending trip: $e');
     }

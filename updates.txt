@@ -1,9 +1,5 @@
-this is just a temprary commit, i'll update it soon cause it is not finished yet(there is some problems with it)
-i've added exit button to admin and driver
-i've removed sign up button and its code from login page
+fixed problems from last commit(about startTime and endTime format)
 
-you need to fix the trips from the admin panel cause they look bad
-
-problems you need to fix:
-start time is null, you need to make it data and time
-end time is looks too long so you need to make at same format as start time
+now user can't start finished trips
+changed trips card design
+moved detections folder to lib directory
