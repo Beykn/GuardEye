@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:graduation/driver_screens/userPage.dart';
 import 'package:graduation/admin_screens.dart/adminPage.dart';
-import 'package:graduation/screens/sign_up_screen.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:graduation/services/auth.dart';
 
@@ -228,43 +227,9 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 10),
 
-                // Sign Up
-
-                Center(
-                  child: Text(
-                    "Don't have an account?",
-                    style: TextStyle(
-                      fontSize: 10,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-
                 const SizedBox(height: 5),
 
-                Center(
-                  child: SizedBox(
-                    width: 280,
-                    child: OutlinedButton(
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>  SignUpScreen()),
-                        );
-                      },
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 15),
-                        side: const BorderSide(color: Color(0XFFBBE1FA)),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8)),
-                      ),
-                      child: const Text("Sign Up",
-                          style: TextStyle(
-                              color: Color(0XFFBBE1FA), fontSize: 16)),
-                    ),
-                  ),
-                ),
+                
                 const SizedBox(height: 30),
               ],
             ),

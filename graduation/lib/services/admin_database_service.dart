@@ -185,13 +185,11 @@ class AdminDatabaseService {
           .collection('trips')
           .get();
 
-      return snapshot.docs.map((doc) => {
-        'id': doc.id,
-        'startingPoint': doc['startingPoint'],
-        'endingPoint': doc['endingPoint'],
-        'date': doc['date'],
-        'hours': doc['hours'],
-      }).toList();
+      return snapshot.docs.map((doc) {
+      final data = doc.data() as Map<String, dynamic>;
+      data['tripId'] = doc.id; // 👈 Add the document id into the map
+      return data;
+    }).toList();
     } catch (e) {
       print('Error fetching trips: $e');
       return [];

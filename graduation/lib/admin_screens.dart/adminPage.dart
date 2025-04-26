@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:graduation/admin_screens.dart/user_list_page.dart'; 
+import 'package:graduation/screens/loginPage.dart';
 
 class AdminPage extends StatelessWidget {
   const AdminPage({super.key});
@@ -52,17 +53,19 @@ class AdminPage extends StatelessWidget {
             ),
             const SizedBox(height: 30),
 
-            // Çıkış Butonu
             ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context); // Çıkış yap
+              onPressed: () { 
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginPage()),
+                );
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color(0xFFBF3131),
                 padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 40),
               ),
               child: const Text(
-                "EXİT",
+                "Exit",
                 style: TextStyle(fontSize: 18, color: Colors.white),
               ),
             ),

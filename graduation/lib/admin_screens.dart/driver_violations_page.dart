@@ -62,71 +62,79 @@ class DriverViolationsPage extends StatelessWidget {
 
 
               return Card(
-                margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ListTile(
-                      leading: const Icon(Icons.warning_amber_rounded, color: Colors.red),
-                      title: Text(type),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (description.isNotEmpty) Text("Description: $description"),
-                          Text("Confidence: ${(confidence * 100).toStringAsFixed(2)}%"),
-                        ],
-                      ),
-                      trailing: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            DateFormat('yyyy-MM-dd HH:mm').format(timestamp),
-                            style: const TextStyle(fontSize: 12),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.delete, color: Colors.red, size: 20),
-                            tooltip: 'Delete Violation',
-                            onPressed: () async {
-                              final confirm = await showDialog<bool>(
-                                context: context,
-                                builder: (context) => AlertDialog(
-                                  title: const Text("Delete Violation"),
-                                  content: const Text("Are you sure you want to delete this violation?"),
-                                  actions: [
-                                    TextButton(
-                                      child: const Text("Cancel"),
-                                      onPressed: () => Navigator.of(context).pop(false),
-                                    ),
-                                    TextButton(
-                                      child: const Text("Delete", style: TextStyle(color: Colors.red)),
-                                      onPressed: () => Navigator.of(context).pop(true),
-                                    ),
-                                  ],
-                                ),
-                              );
+                elevation: 4, // <-- Added shadow
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12), // <-- Rounded corners
+                ),
+                margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10), // <-- More space between cards
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ListTile(
+                        leading: const Icon(Icons.warning_amber_rounded, color: Colors.red),
+                        title: Text(type),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (description.isNotEmpty) Text("Description: $description"),
+                            Text("Confidence: ${(confidence * 100).toStringAsFixed(2)}%"),
+                            const SizedBox(height: 4), // small space
+                            Text(
+                              DateFormat('yyyy-MM-dd HH:mm').format(timestamp),
+                              style: const TextStyle(fontSize: 12),
+                            ),
+                          ],
+                        ),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.delete, color: Colors.red, size: 20),
+                          tooltip: 'Delete Violation',
+                          onPressed: () async {
+                            final confirm = await showDialog<bool>(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: const Text("Delete Violation"),
+                                content: const Text("Are you sure you want to delete this violation?"),
+                                actions: [
+                                  TextButton(
+                                    child: const Text("Cancel"),
+                                    onPressed: () => Navigator.of(context).pop(false),
+                                  ),
+                                  TextButton(
+                                    child: const Text("Delete", style: TextStyle(color: Colors.red)),
+                                    onPressed: () => Navigator.of(context).pop(true),
+                                  ),
+                                ],
+                              ),
+                            );
 
-                              if (confirm == true) {
-                                final violationId = violations[index].id;
-                                await _adminDbService.deleteViolation(driverId, violationId);
-                              }
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                    if (imageBytes != null)
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Image.memory(
-                          imageBytes,
-                          height: 200,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
+                            if (confirm == true) {
+                              final violationId = violations[index].id;
+                              await _adminDbService.deleteViolation(driverId, violationId);
+                            }
+                          },
                         ),
                       ),
-                  ],
+
+                      if (imageBytes != null) ...[
+                        const Divider(thickness: 1.5), // <-- Line separator
+                        const SizedBox(height: 8),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image.memory(
+                            imageBytes,
+                            height: 200,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
                 ),
               );
+
 
 
             },

@@ -1,5 +1,5 @@
-all the following changes were made to improve the performance of the code
-passed the uid from login to userPage so we don't need to fetch it again
-added a function to login and a loading state to the login page
-changed the _userFromFirebase in auth file to only fetch the role not the whole user
-removed trips array from getDriverData in database file so we don't need to fetch in that function, when we need it we can fetch it using the getDriverTrips functions
+fixed problems from last commit(about startTime and endTime format)
+
+now user can't start finished trips
+changed trips card design
+moved detections folder to lib directory

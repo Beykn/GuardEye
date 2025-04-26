@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:graduation/models/userInfo.dart';
 import 'package:graduation/services/admin_database_service.dart';
-import 'package:graduation/services/auth.dart';
 
 class UserDetail extends StatefulWidget {
   final String uid;
