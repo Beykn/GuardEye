@@ -191,6 +191,15 @@ class _UserPageState extends State<UserPage> {
           },
         ),
         const SizedBox(height: 30),
+        _buildActionCard(
+          icon: FontAwesomeIcons.userCheck,
+          label: "Face Verification",
+          color: const Color(0XFF3282B8),
+          onTap: () {
+            Navigator.pushNamed(context, '/face-verification');
+          },
+        ),
+        const SizedBox(height: 30),
 
         // Exit Button - AdminPanel Style
         ElevatedButton(

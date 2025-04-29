@@ -49,6 +49,9 @@ dependencies:
   shared_preferences_android: ^2.4.7
   image_picker: ^1.1.2
 
+
+
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -77,6 +80,7 @@ flutter:
     - assets/2cls_640_ssd.tflite
     - assets/ssd_3cls_aug.tflite
     - assets/ssd_all_data.tflite
+    - assets/facenet.tflite
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

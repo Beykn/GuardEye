@@ -3,6 +3,7 @@ import 'package:graduation/screens/loginPage.dart';
 import 'package:graduation/admin_screens.dart/adminPage.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:graduation/admin_screens.dart/user_list_page.dart';
+import 'package:graduation/face_verification.dart';
 
 import 'admin_screens.dart/admin_detail.dart';
 
@@ -30,6 +31,7 @@ class MyApp extends StatelessWidget {
         '/userList': (context) => const UserListPage(),
         '/admin': (context) => const AdminPage(),
         '/admin/detail': (context) => AdminDetailPage(),
+        '/face-verification': (context) => const FaceVerificationPage(),
 
       },
     );
