@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:graduation/models/userInfo.dart';
@@ -99,37 +101,71 @@ class _UserDetailState extends State<UserDetail> {
         child: Form(
           key: _formKey,
           child: ListView(
-            children: [
-              TextFormField(
-                controller: _firstNameController,
-                decoration: const InputDecoration(labelText: "First Name"),
-                readOnly: !_isEditable,
-                validator: (value) => value!.isEmpty ? "Required" : null,
-              ),
-              const SizedBox(height: 10),
-              TextFormField(
-                controller: _lastNameController,
-                decoration: const InputDecoration(labelText: "Last Name"),
-                readOnly: !_isEditable,
-                validator: (value) => value!.isEmpty ? "Required" : null,
-              ),
-              const SizedBox(height: 10),
-              TextFormField(
-                controller: _ageController,
-                decoration: const InputDecoration(labelText: "Age"),
-                keyboardType: TextInputType.number,
-                readOnly: !_isEditable,
-                validator: (value) =>
-                (value == null || int.tryParse(value) == null) ? "Enter valid age" : null,
-              ),
-              const SizedBox(height: 20),
-              if (_isEditable)
-                ElevatedButton(
-                  onPressed: _saveUserData,
-                  child: const Text("Save Changes"),
-                ),
-            ],
-          ),
+  children: [
+    // Profile image
+    if (userInfo.image != null && userInfo.image!.isNotEmpty)
+      Center(
+        child: CircleAvatar(
+          radius: 60,
+          backgroundImage: MemoryImage(base64Decode(userInfo.image!)),
+        ),
+      )
+    else
+      Center(
+        child: CircleAvatar(
+          radius: 60,
+          child: Icon(Icons.person, size: 50),
+        ),
+      ),
+    const SizedBox(height: 10),
+
+    // Username
+    Center(
+      child: Text(
+        userInfo.username ?? 'No username',
+        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      ),
+    ),
+    const SizedBox(height: 20),
+
+    // First name field
+    TextFormField(
+      controller: _firstNameController,
+      decoration: const InputDecoration(labelText: "First Name"),
+      readOnly: !_isEditable,
+      validator: (value) => value!.isEmpty ? "Required" : null,
+    ),
+    const SizedBox(height: 10),
+
+    // Last name field
+    TextFormField(
+      controller: _lastNameController,
+      decoration: const InputDecoration(labelText: "Last Name"),
+      readOnly: !_isEditable,
+      validator: (value) => value!.isEmpty ? "Required" : null,
+    ),
+    const SizedBox(height: 10),
+
+    // Age field
+    TextFormField(
+      controller: _ageController,
+      decoration: const InputDecoration(labelText: "Age"),
+      keyboardType: TextInputType.number,
+      readOnly: !_isEditable,
+      validator: (value) =>
+          (value == null || int.tryParse(value) == null) ? "Enter valid age" : null,
+    ),
+    const SizedBox(height: 20),
+
+    // Save button
+    if (_isEditable)
+      ElevatedButton(
+        onPressed: _saveUserData,
+        child: const Text("Save Changes"),
+      ),
+  ],
+),
+
         ),
       ),
     );

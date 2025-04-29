@@ -69,86 +69,103 @@ class _UserPageState extends State<UserPage> {
   }
 
   Widget _buildProfileCard(Driver user) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return Container(
-      padding: const EdgeInsets.all(50),
-      width: 700,
+      padding: const EdgeInsets.all(30),
+      width: screenWidth > 700 ? 700 : screenWidth * 0.9, // Responsive width
       decoration: BoxDecoration(
         color: Colors.grey.shade800,
         borderRadius: BorderRadius.circular(16),
         boxShadow: const [BoxShadow(color: Colors.black38, blurRadius: 8)],
       ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final isSmallScreen = constraints.maxWidth < 500;
+          return isSmallScreen
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    _buildAvatar(user),
+                    const SizedBox(height: 20),
+                    _buildUserInfo(user, isSmallScreen),
+                  ],
+                )
+              : Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildAvatar(user),
+                    const SizedBox(width: 20),
+                    Expanded(child: _buildUserInfo(user, isSmallScreen)),
+                  ],
+                );
+        },
+      ),
+    );
+  }
 
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          //Avatar sol taraf
-          CircleAvatar(
-            radius: 70,
-            backgroundColor: Colors.white12,
-            backgroundImage: user.image.isNotEmpty
-                ? MemoryImage(
-                    base64Decode(user.image),
-                  )
-                : null,
-            child: user.image.isEmpty
-                ? const Icon(Icons.person, color: Colors.white, size: 70)
-                : null,
+  Widget _buildAvatar(Driver user) {
+    return CircleAvatar(
+      radius: 60,
+      backgroundColor: Colors.white12,
+      backgroundImage: user.image.isNotEmpty
+          ? MemoryImage(base64Decode(user.image))
+          : null,
+      child: user.image.isEmpty
+          ? const Icon(Icons.person, color: Colors.white, size: 60)
+          : null,
+    );
+  }
+
+  Widget _buildUserInfo(Driver user, bool isSmallScreen) {
+    return Column(
+      crossAxisAlignment:
+          isSmallScreen ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+      children: [
+        Text(
+          "${user.firstName} ${user.lastName}",
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
           ),
-          const SizedBox(width: 20),
-
-          // Sağda bilgiler + buton
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "${user.firstName} ${user.lastName}",
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  "Age: ${user.age}",
-                  style: const TextStyle(color: Colors.white70, fontSize: 16),
-                ),
-                const SizedBox(height: 16),
-
-                Align(
-                  alignment: Alignment.bottomRight,
-                  child: OutlinedButton.icon(
-                    onPressed: () async {
-                      final result = await Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => UserDetail(uid: uid)),
-                      );
-                      if (result == true) {
-                        setState(() {
-                          userDataFuture = dbService.getDriverData();
-                        });
-                      }
-                    },
-                    icon: const Icon(Icons.info_outline, color: Colors.white),
-                    label: const Text(
-                      "Details",
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500),
-                    ),
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: Colors.white60),
-                      foregroundColor: Colors.white,
-                    ),
-                  ),
-                ),
-              ],
+        ),
+        const SizedBox(height: 6),
+        Text(
+          "Age: ${user.age}",
+          style: const TextStyle(color: Colors.white70, fontSize: 16),
+        ),
+        const SizedBox(height: 16),
+        Align(
+          alignment: isSmallScreen ? Alignment.center : Alignment.bottomRight,
+          child: OutlinedButton.icon(
+            onPressed: () async {
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => UserDetail(uid: uid)),
+              );
+              if (result == true) {
+                setState(() {
+                  userDataFuture = dbService.getDriverData();
+                });
+              }
+            },
+            icon: const Icon(Icons.info_outline, color: Colors.white),
+            label: const Text(
+              "Details",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            style: OutlinedButton.styleFrom(
+              side: const BorderSide(color: Colors.white60),
+              foregroundColor: Colors.white,
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 

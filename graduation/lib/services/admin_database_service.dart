@@ -21,6 +21,7 @@ class AdminDatabaseService {
           trips: [],
           UID: doc.id, 
           image: data['imageBase64'] ?? '',
+          username: data['email'] ?? '',
         );
       }).toList();
     } catch (e) {
@@ -143,6 +144,7 @@ class AdminDatabaseService {
           UID: snapshot.id,
           trips: [],
           image: data['imageBase64'] ?? '',
+          username: data['email'] ?? '',
         );
       } else {
         return null;
@@ -170,6 +172,7 @@ class AdminDatabaseService {
           UID: snapshot.id,
           trips: trips,
           image: data['imageBase64'] ?? '',
+          username: data['email'] ?? '',
         );
       } else {
         return null;

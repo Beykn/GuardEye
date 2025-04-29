@@ -131,6 +131,7 @@ class UserDatabaseService {
           UID: snapshot.id,
           trips: [],
           image: data['imageBase64'] ?? '',
+          username: data['email'] ?? '',
         );
       } else {
         return null;
