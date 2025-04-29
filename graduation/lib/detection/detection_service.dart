@@ -29,7 +29,7 @@ class DetectionService {
 
       // Load model
       _interpreter = await Interpreter.fromAsset(
-        'assets/ssd_3cls_aug.tflite',
+        'assets/ssd_all_data.tflite',
         options: options,
       );
 

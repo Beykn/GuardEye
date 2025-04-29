@@ -491,9 +491,9 @@
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  _buildDetectionProgressIndicator('phone'),
-                  _buildDetectionProgressIndicator('cigarette'),
                   _buildDetectionProgressIndicator('vape'),
+                  _buildDetectionProgressIndicator('cigarette'),
+                  _buildDetectionProgressIndicator('phone'),
                 ],
               ),
             ),
@@ -504,9 +504,9 @@
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildCooldownIndicator('phone'),
-                  _buildCooldownIndicator('cigarette'),
                   _buildCooldownIndicator('vape'),
+                  _buildCooldownIndicator('cigarette'),
+                  _buildCooldownIndicator('phone'),
                 ],
               ),
             ),

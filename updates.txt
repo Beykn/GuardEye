@@ -1,5 +1,4 @@
-fixed problems from last commit(about startTime and endTime format)
+i've added a new model
 
-now user can't start finished trips
-changed trips card design
-moved detections folder to lib directory
+i've linked biometrics authentication with database, now when you login with username and password the uid gets saved in the phone,
+next time when you use biometrics it will use the same uid stored in phone

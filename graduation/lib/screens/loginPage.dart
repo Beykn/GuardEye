@@ -3,6 +3,7 @@ import 'package:graduation/driver_screens/userPage.dart';
 import 'package:graduation/admin_screens.dart/adminPage.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:graduation/services/auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -29,26 +30,47 @@ class _LoginPageState extends State<LoginPage> {
     if (canCheckBiometrics) {
       try {
         isAuthenticated = await _auth.authenticate(
-          localizedReason: 'Lütfen Face ID / Parmak izi ile giriş yapın',
+          localizedReason: 'Please authenticate to access your account',
           options: const AuthenticationOptions(biometricOnly: true),
         );
       } catch (e) {
-        debugPrint("Biyometrik doğrulama hatası: $e");
+        debugPrint("error with biometric authentication: $e");
       }
 
       if (isAuthenticated) {
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => const UserPage(uid: "tempUid")));
+        final prefs = await SharedPreferences.getInstance();
+        final uid = prefs.getString('saved_uid');
+        final role = prefs.getString('role');
+
+
+        if (uid != null && role != null) {
+          if (role == 'driver') {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => UserPage(uid: uid)),
+            );
+          } else if (role == 'admin') {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const AdminPage()),
+            );
+          }
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("No saved UID found. Please login manually first.")),
+          );
+        }
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Cihazınız biyometrik doğrulama desteklemiyor."),
+          content: Text("Biometric authentication is not available on this device."),
           backgroundColor: Colors.orange,
         ),
       );
     }
   }
+
 
   Future<void> _handleLogin() async {
     if (_formKey.currentState?.validate() ?? false) {
@@ -56,20 +78,32 @@ class _LoginPageState extends State<LoginPage> {
 
       try {
         final result = await _firebase_auth.signInWithEmailAndPassword(email, password);
-        if (result != null && result.role == "driver") {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => UserPage(uid: result.uid)),
-          );
-        } else if (result != null && result.role == "admin") {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const AdminPage()),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Login failed, wrong username or password.")),
-          );
+        if (result != null) {
+          // Store UID
+          print("Login successful: ${result.uid}");
+          try {
+            final prefs = await SharedPreferences.getInstance();
+            await prefs.setString('saved_uid', result.uid);
+            await prefs.setString('role', result.role); 
+          } catch (e) {
+            print("Error saving to SharedPreferences: $e");
+          }
+
+          if (result.role == "driver") {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => UserPage(uid: result.uid)),
+            );
+          } else if (result.role == "admin") {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const AdminPage()),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Login failed, wrong username or password.")),
+            );
+          }
         }
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
