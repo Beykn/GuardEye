@@ -5,6 +5,7 @@ class Driver {
   final int age;
   final String role;
   final String UID;
+  final String image;
   final List<Map<String, dynamic>> trips;
 
   Driver({
@@ -14,6 +15,7 @@ class Driver {
     required this.role,
     required this.UID,
     required this.trips,
+    required this.image,
   });
 
   // Map Firestore document to User object
@@ -25,6 +27,7 @@ class Driver {
       role: firestoreData['role'] ?? '',
       UID: firestoreData['id'] ?? '',
       trips: List<Map<String, dynamic>>.from(firestoreData['trips'] ?? []),
+      image: firestoreData['imageBase64'] ?? '',
     );
   }
   

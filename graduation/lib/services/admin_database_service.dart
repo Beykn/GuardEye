@@ -20,6 +20,7 @@ class AdminDatabaseService {
           role: data['role'] ?? '',
           trips: [],
           UID: doc.id, 
+          image: data['imageBase64'] ?? '',
         );
       }).toList();
     } catch (e) {
@@ -141,6 +142,7 @@ class AdminDatabaseService {
           role: data['role'] ?? '',
           UID: snapshot.id,
           trips: [],
+          image: data['imageBase64'] ?? '',
         );
       } else {
         return null;
@@ -167,6 +169,7 @@ class AdminDatabaseService {
           role: data['role'] ?? '',
           UID: snapshot.id,
           trips: trips,
+          image: data['imageBase64'] ?? '',
         );
       } else {
         return null;

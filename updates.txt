@@ -1,4 +1,1 @@
-i've added a new model
-
-i've linked biometrics authentication with database, now when you login with username and password the uid gets saved in the phone,
-next time when you use biometrics it will use the same uid stored in phone
+added image to add driver page and user page

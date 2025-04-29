@@ -16,13 +16,14 @@ class UserDatabaseService {
 
 
   // Update user data (driver profile)
-  Future updateUserData(String firstName, String lastName, String email, String age) async {
+  Future updateUserData(String firstName, String lastName, String email, String age, String image ) async {
     return await _driverCollection.doc(uid).set({
       'first_name': firstName,
       'last_name': lastName,
       'email': email,
       'age': age,
       'role': 'driver',
+      'imageBase64': image,
     });
   }
 
@@ -129,6 +130,7 @@ class UserDatabaseService {
           role: data['role'] ?? '',
           UID: snapshot.id,
           trips: [],
+          image: data['imageBase64'] ?? '',
         );
       } else {
         return null;

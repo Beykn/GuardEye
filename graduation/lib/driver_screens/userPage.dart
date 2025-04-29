@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -80,10 +82,17 @@ class _UserPageState extends State<UserPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           //Avatar sol taraf
-          const CircleAvatar(
+          CircleAvatar(
             radius: 70,
             backgroundColor: Colors.white12,
-            child: Icon(Icons.person, color: Colors.white, size: 70),
+            backgroundImage: user.image.isNotEmpty
+                ? MemoryImage(
+                    base64Decode(user.image),
+                  )
+                : null,
+            child: user.image.isEmpty
+                ? const Icon(Icons.person, color: Colors.white, size: 70)
+                : null,
           ),
           const SizedBox(width: 20),
 

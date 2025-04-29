@@ -1,5 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:graduation/services/auth.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+import 'package:image/image.dart' as img;
 class AddDriverPage extends StatefulWidget {
   const AddDriverPage({super.key});
 
@@ -17,7 +22,47 @@ class _AddDriverPageState extends State<AddDriverPage> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
 
+  File? _imageFile;
+  String _imageString = ""; // Initialize with an empty string
+
   bool _isSaving = false;
+
+  Future<String?> compressAndEncodeImage(File imageFile) async {
+    // Read image from file
+    final originalBytes = await imageFile.readAsBytes();
+    final decodedImage = img.decodeImage(originalBytes);
+
+    if (decodedImage == null) return null;
+
+    // Resize image to reduce size (e.g., 300px width)
+    final resizedImage = img.copyResize(decodedImage, width: 300);
+
+    // Encode as JPEG with lower quality (e.g., 60%)
+    final compressedBytes = img.encodeJpg(resizedImage, quality: 60);
+
+    // Convert to base64
+    return base64Encode(compressedBytes);
+  }
+
+  Future<void> _pickImage() async {
+    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (pickedFile == null) return;
+
+    final imageFile = File(pickedFile.path);
+    final compressedBase64 = await compressAndEncodeImage(imageFile);
+
+    if (compressedBase64 != null && compressedBase64.length < 1048487) {
+      setState(() {
+        _imageFile = imageFile;
+        _imageString = compressedBase64;
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Image too large. Please choose a smaller image.')),
+      );
+    }
+  }
+
 
   Future<void> _saveDriver() async {
     if (!_formKey.currentState!.validate()) return;
@@ -30,6 +75,7 @@ class _AddDriverPageState extends State<AddDriverPage> {
       _firstNameController.text,
       _lastNameController.text,
       _ageController.text,
+      _imageString,
     );
 
     setState(() => _isSaving = false);
@@ -40,11 +86,12 @@ class _AddDriverPageState extends State<AddDriverPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Add New Driver")),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Form(
           key: _formKey,
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               TextFormField(
                 controller: _firstNameController,
@@ -62,8 +109,7 @@ class _AddDriverPageState extends State<AddDriverPage> {
                 controller: _ageController,
                 keyboardType: TextInputType.number,
                 decoration: const InputDecoration(labelText: 'Age'),
-                validator: (value) =>
-                int.tryParse(value!) == null ? 'Enter valid number' : null,
+                validator: (value) => int.tryParse(value!) == null ? 'Enter valid number' : null,
               ),
               const SizedBox(height: 24),
               TextFormField(
@@ -76,20 +122,34 @@ class _AddDriverPageState extends State<AddDriverPage> {
                 controller: _passwordController,
                 obscureText: true,
                 decoration: const InputDecoration(labelText: 'Password'),
-                validator: (value) =>
-                    value != null && value.length < 6 ? 'Min 6 characters' : null,
+                validator: (value) => value != null && value.length < 6 ? 'Min 6 characters' : null,
               ),
+              const SizedBox(height: 24),
+              GestureDetector(
+                onTap: _pickImage,
+                child: _imageFile == null
+                    ? CircleAvatar(
+                        radius: 75,
+                        backgroundColor: Colors.grey[300],
+                        child: Icon(Icons.add_a_photo, size: 40, color: Colors.black54),
+                      )
+                    : CircleAvatar(
+                        radius: 75,
+                        backgroundImage: FileImage(_imageFile!),
+                      ),
+              ),
+
               const SizedBox(height: 24),
               ElevatedButton.icon(
                 onPressed: _isSaving ? null : _saveDriver,
                 icon: const Icon(Icons.save),
                 label: Text(_isSaving ? "Saving..." : "Add Driver"),
               ),
-              
             ],
           ),
         ),
       ),
+
     );
   }
 }
