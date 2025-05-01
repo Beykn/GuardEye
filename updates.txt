@@ -1,3 +1,1 @@
-removed unused models
-add image and username to user details page
-changed user block in user page(it was too big for phones with small screens)
+added automatic face recognition(every n seconds it will take a picture and send it to the server)

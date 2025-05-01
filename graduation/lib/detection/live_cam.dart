@@ -1,4 +1,6 @@
-  import 'dart:io';
+  import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
   import 'dart:collection';
   import 'package:flutter/material.dart';
   import 'package:camera/camera.dart';
@@ -10,6 +12,7 @@
   import 'package:graduation/inner_services/violation_handler.dart';
   import 'package:graduation/models/violation.dart';
   import 'package:graduation/models/violations_helper.dart';
+  import 'package:http/http.dart' as http;
 
   late List<CameraDescription> cameras;
 
@@ -33,6 +36,9 @@
     bool _isCameraInitialized = false;
     int _lastProcessingTime = 0;
     int _currentCameraIndex = 0;
+
+    Timer? _uploadTimer;
+    final Duration _recognitionInterval = const Duration(seconds: 30);
     
     // Queue to store detected violations
     final Queue<PendingViolation> _violationsQueue = Queue<PendingViolation>();
@@ -74,7 +80,15 @@
       _userDb = UserDatabaseService(uid: widget.uid);
       _initializeCamera();
       _startTime = DateTime.now();
+      _startPeriodicUploads();
     }
+
+    void _startPeriodicUploads() {
+    _uploadTimer = Timer.periodic(
+      _recognitionInterval,  // Fires every minute
+      (timer) => _captureAndUploadImage(),
+    );
+  }
 
     @override
     void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -232,6 +246,51 @@
         print('Error checking for violations: $e');
       } finally {
         _isCheckingViolations = false;
+      }
+    }
+
+    Future<String> _convertImageToBase64Efficiently(File imageFile) async {
+      try {
+        // Use direct file reading for better performance
+        final bytes = await imageFile.readAsBytes();
+        return base64Encode(bytes);
+      } catch (e) {
+        print('Error converting image to base64: $e');
+        rethrow;
+      }
+    }
+
+    Future<void> _captureAndUploadImage() async {
+      if (_controller == null || !_controller!.value.isInitialized) return;
+
+      try {
+        // Capture the current camera frame
+        final XFile cameraImage = await _controller!.takePicture();
+        
+        // Convert to a file
+        final File imageFile = File(cameraImage.path);
+        final String base64Image = await _convertImageToBase64Efficiently(imageFile);
+
+        print('sending image to server...');
+
+        // Upload to server (non-blocking)
+        http.post(
+          Uri.parse('http://192.168.1.107:3000/check'),
+          body: jsonEncode({
+            'driverId': widget.uid,
+            'testImage': base64Image,
+          }),
+          headers: {'Content-Type': 'application/json'},
+        ).then((response) {
+          print('Image uploaded successfully!');
+        }).catchError((error) {
+          print('Upload failed: $error');
+        });
+
+        // Delete the temporary file
+        await imageFile.delete();
+      } catch (e) {
+        print('Error capturing/uploading image: $e');
       }
     }
 
@@ -418,6 +477,7 @@
     void dispose() {
       WidgetsBinding.instance.removeObserver(this);
       _controller?.dispose();
+      _uploadTimer?.cancel();
       super.dispose();
     }
 
