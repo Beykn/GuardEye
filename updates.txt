@@ -1,1 +1,1 @@
-added image to add driver page and user page
+added automatic face recognition(every n seconds it will take a picture and send it to the server)

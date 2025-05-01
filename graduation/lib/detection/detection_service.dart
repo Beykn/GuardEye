@@ -16,6 +16,7 @@ class DetectionService {
   late final Map<int, Object> _outputs;
   late final List<List<List<List<double>>>> _inputArray;
   late final IsolateInterpreter _isolateInterpreter;
+  
 
   Future<void> loadModel() async {
     if (_initialized) return;
