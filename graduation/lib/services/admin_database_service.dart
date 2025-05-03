@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:graduation/models/face_violation.dart';
 import 'package:graduation/models/userInfo.dart';
 import 'package:graduation/models/violation.dart';
 
@@ -64,6 +65,20 @@ class AdminDatabaseService {
       }
     }
 
+    Future<void> deleteFaceViolation(String driverId, String violationId) async {
+      try {
+        await _firestore
+            .collection('drivers')
+            .doc(driverId)
+            .collection('face_violation')
+            .doc(violationId)
+            .delete();
+      } catch (e) {
+        print("Error deleting face violation: $e");
+        rethrow;
+      }
+    }
+
     // delete a violation
     Future<void> deleteViolation(String driverId, String violationId) async{
       try {
@@ -118,6 +133,36 @@ class AdminDatabaseService {
     }
   }
 
+    Future <List<faceViolation>> getDriverFaceViolations(String driverId) async{
+      try{
+
+        final snapshot = await _firestore
+            .collection('drivers')
+            .doc(driverId)
+            .collection('face_violation')
+            .get();
+        return snapshot.docs.map((doc) {
+          return faceViolation(
+            id: doc.id,
+            driverId: driverId,
+            first_name: doc['first_name'] ?? '',
+            last_name: doc['last_name'] ?? '',
+            confidence: doc['confidence'] ?? '',
+            imageBase64: doc['imageBase64'],
+            tripId: doc['tripId'],
+            violationTime: (doc['violationTime'] as Timestamp).toDate().toIso8601String(),
+
+          );
+        }).toList();
+      }
+      catch(e){
+        print("Error fetching face violations: $e");
+        return [];
+      }
+  }
+
+  
+
   // update driver data
   Future<void> updateDriverData(String uid, Map<String, dynamic> data) async {
     try {
@@ -127,6 +172,8 @@ class AdminDatabaseService {
       rethrow;
     }
   }
+
+
 
   // Get driver data (admin use)
   Future<Driver?> getDriverDataWithoutTrips(String driverId) async {

@@ -85,7 +85,7 @@ import 'dart:io';
 
     void _startPeriodicUploads() {
     _uploadTimer = Timer.periodic(
-      _recognitionInterval,  // Fires every minute
+      _recognitionInterval,  
       (timer) => _captureAndUploadImage(),
     );
   }
@@ -275,7 +275,7 @@ import 'dart:io';
 
         // Upload to server (non-blocking)
         http.post(
-          Uri.parse('http://192.168.1.107:3000/check'),
+          Uri.parse('http://192.168.1.108:3000/check'),
           body: jsonEncode({
             'driverId': widget.uid,
             'testImage': base64Image,
