@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:graduation/userDetail.dart';
 import 'package:graduation/admin_screens.dart/user_route_details.dart';
 import 'package:graduation/admin_screens.dart/driver_violations_page.dart';
+import 'package:graduation/admin_screens.dart/face_violations.dart';
 class DriverOptionsPage extends StatelessWidget {
   final String driverId;
   final String driverName;
@@ -62,6 +63,25 @@ class DriverOptionsPage extends StatelessWidget {
                 );
               },
             ),
+
+            const SizedBox(height: 20),
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(minimumSize: const Size.fromHeight(50)),
+                icon: const Icon(Icons.person_off),
+                label: const Text("Face Violations"),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => DriverFaceViolationsPage(
+                        driverId: driverId,
+                        driverName: driverName,
+                      ),
+                    ),
+                  );
+                },
+              ),
+
           ],
         ),
       ),

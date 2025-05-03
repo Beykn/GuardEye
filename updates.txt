@@ -1,1 +1,3 @@
-added automatic face recognition(every n seconds it will take a picture and send it to the server)
+added face violation model 
+added face violation page
+added the necessary function to admin database file to handel the face violations
