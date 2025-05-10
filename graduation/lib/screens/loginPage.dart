@@ -21,7 +21,37 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final _firebase_auth = AuthService();
   bool isLoading = false;
-  
+
+
+
+  Future<void> _resetPassword() async {
+    if (email.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Lütfen e-posta adresinizi girin."),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
+    try {
+      await _firebase_auth.sendPasswordResetEmail(email);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Şifre sıfırlama bağlantısı e-posta adresinize gönderildi."),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Hata: ${e.toString()}"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
 
   Future<void> _authenticateWithBiometrics() async {
     bool canCheckBiometrics = await _auth.canCheckBiometrics;
@@ -241,17 +271,10 @@ class _LoginPageState extends State<LoginPage> {
                 const SizedBox(height: 15),
 
                 // Forgot Password
+
                 Center(
                   child: TextButton(
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content:
-                          Text("Şifre sıfırlama işlemi yakında eklenecek."),
-                          backgroundColor: Colors.deepOrange,
-                        ),
-                      );
-                    },
+                    onPressed: _resetPassword,
                     child: const Text(
                       "Forgot Password?",
                       style: TextStyle(
