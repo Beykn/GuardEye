@@ -1,3 +1,1 @@
-added face violation model 
-added face violation page
-added the necessary function to admin database file to handel the face violations
+i've updated the live_cam file to skip some frames to increase fps
