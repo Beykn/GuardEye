@@ -11,6 +11,18 @@ class AdminPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text("Admin Panel"),
         centerTitle: true,
+        actions: [
+          // Admin Detail Button in the top right with white logo
+          IconButton(
+            icon: ColorFiltered(
+              colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+              child: Image.asset('assets/admin_logo.png'), // Replace with your logo path
+            ),
+            onPressed: () {
+              Navigator.pushNamed(context, "/admin/detail");
+            },
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -29,28 +41,6 @@ class AdminPage extends StatelessWidget {
             ),
             const SizedBox(height: 16),
 
-            // Admin Detail Container
-            _buildContainer(
-              context,
-              title: "Admin Detail",
-              icon: Icons.admin_panel_settings,
-              color: Color(0XFF328E6E),
-              onTap: () {
-                Navigator.pushNamed(context, "/admin/detail"); 
-              },
-            ),
-            const SizedBox(height: 16),
-
-            // All Records Container
-            _buildContainer(
-              context,
-              title: "All Records",
-              icon: Icons.list_alt,
-              color: Color(0XFFEA7300),
-              onTap: () {
-                Navigator.pushNamed(context, "/records"); // Kayıt sayfası (oluşturulmalı)
-              },
-            ),
             const SizedBox(height: 30),
 
             ElevatedButton(

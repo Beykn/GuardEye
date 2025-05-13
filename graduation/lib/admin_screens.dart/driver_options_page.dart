@@ -3,10 +3,11 @@ import 'package:graduation/userDetail.dart';
 import 'package:graduation/admin_screens.dart/user_route_details.dart';
 import 'package:graduation/admin_screens.dart/driver_violations_page.dart';
 import 'package:graduation/admin_screens.dart/face_violations.dart';
+
 class DriverOptionsPage extends StatelessWidget {
   final String driverId;
   final String driverName;
-  const DriverOptionsPage({super.key, required this.driverId,required this.driverName});
+  const DriverOptionsPage({super.key, required this.driverId, required this.driverName});
 
   @override
   Widget build(BuildContext context) {
@@ -17,9 +18,12 @@ class DriverOptionsPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            ElevatedButton.icon(
-              icon: const Icon(Icons.info_outline),
-              label: const Text("Driver Detail"),
+            // Driver Detail Button
+            _buildButton(
+              context,
+              icon: Icons.info_outline,
+              label: "Driver Detail",
+              color: Colors.blueAccent, // Blue button
               onPressed: () {
                 Navigator.push(
                   context,
@@ -29,17 +33,22 @@ class DriverOptionsPage extends StatelessWidget {
                 );
               },
             ),
+
             const SizedBox(height: 20),
-            ElevatedButton.icon(
-              icon: const Icon(Icons.route),
-              label: const Text("Trip List"),
+
+            // Trip List Button
+            _buildButton(
+              context,
+              icon: Icons.route,
+              label: "Trip List",
+              color: Colors.green, // Green button
               onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => DriverDetailPage(
                       driverId: driverId,
-                      driverName: "$driverName",
+                      driverName: driverName,
                     ),
                   ),
                 );
@@ -47,10 +56,13 @@ class DriverOptionsPage extends StatelessWidget {
             ),
 
             const SizedBox(height: 20),
-            ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(minimumSize: const Size.fromHeight(50)),
-              icon: const Icon(Icons.warning),
-              label: const Text("View Violations"),
+
+            // View Violations Button
+            _buildButton(
+              context,
+              icon: Icons.warning,
+              label: "View Violations",
+              color: Colors.redAccent, // Red button
               onPressed: () {
                 Navigator.push(
                   context,
@@ -65,25 +77,62 @@ class DriverOptionsPage extends StatelessWidget {
             ),
 
             const SizedBox(height: 20),
-              ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(minimumSize: const Size.fromHeight(50)),
-                icon: const Icon(Icons.person_off),
-                label: const Text("Face Violations"),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => DriverFaceViolationsPage(
-                        driverId: driverId,
-                        driverName: driverName,
-                      ),
-                    ),
-                  );
-                },
-              ),
 
+            // Monitor Face Violations Button
+            _buildButton(
+              context,
+              icon: Icons.person_off,
+              label: "Monitor Face Violations", // Updated label
+              color: Colors.orange, // Orange button
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => DriverFaceViolationsPage(
+                      driverId: driverId,
+                      driverName: driverName,
+                    ),
+                  ),
+                );
+              },
+            ),
           ],
         ),
+      ),
+    );
+  }
+
+  // Reusable Button Widget with Color and Alignment Adjustment
+  Widget _buildButton(BuildContext context, {
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onPressed,
+  }) {
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        foregroundColor: Colors.white, // Icon and text color
+        backgroundColor: color, // Custom color for each button
+        minimumSize: const Size.fromHeight(60), // Height of the button
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12), // Rounded corners
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+      ),
+      onPressed: onPressed,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center, // Center the button's content
+        children: [
+          Icon(icon, size: 30), // Icon
+          const SizedBox(width: 12), // Space between icon and label
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -28,7 +28,7 @@ class _LoginPageState extends State<LoginPage> {
     if (email.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Lütfen e-posta adresinizi girin."),
+          content: Text("Please enter your email address."),
           backgroundColor: Colors.orange,
         ),
       );
@@ -39,7 +39,7 @@ class _LoginPageState extends State<LoginPage> {
       await _firebase_auth.sendPasswordResetEmail(email);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Şifre sıfırlama bağlantısı e-posta adresinize gönderildi."),
+          content: Text("The password reset link has been sent to your email address."),
           backgroundColor: Colors.green,
         ),
       );
@@ -129,13 +129,15 @@ class _LoginPageState extends State<LoginPage> {
               context,
               MaterialPageRoute(builder: (context) => const AdminPage()),
             );
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Login failed, wrong username or password.")),
-            );
           }
+        } else {
+          // Handle incorrect login
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Login failed, wrong username or password.")),
+          );
         }
       } catch (e) {
+        // Catch any other errors (e.g., network issues, etc.)
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Error: $e")),
         );
@@ -144,6 +146,7 @@ class _LoginPageState extends State<LoginPage> {
       }
     }
   }
+
 
   @override
   Widget build(BuildContext context) {

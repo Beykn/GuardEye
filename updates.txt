@@ -1,1 +1,1 @@
-i've updated the live_cam file to skip some frames to increase fps
+updated the design of the admin panel main page, driver options and added text message for wrong password or username login
