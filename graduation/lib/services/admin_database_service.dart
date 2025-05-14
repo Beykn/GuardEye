@@ -149,7 +149,7 @@ class AdminDatabaseService {
             last_name: doc['last_name'] ?? '',
             confidence: doc['confidence'] ?? '',
             imageBase64: doc['imageBase64'],
-            tripId: doc['tripId'],
+            tripId: doc['tripID'],
             violationTime: (doc['violationTime'] as Timestamp).toDate().toIso8601String(),
 
           );
