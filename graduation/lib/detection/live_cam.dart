@@ -273,7 +273,7 @@ class _LiveCamState extends State<LiveCam> with WidgetsBindingObserver {
 
       // Upload to server using a non-blocking approach
       unawaited(http.post(
-        Uri.parse('http://192.168.1.108:3000/check'),
+        Uri.parse('http://192.168.136.81:3000/check'),
         body: jsonEncode({
           'driverId': widget.uid,
           'testImage': base64Image,

@@ -90,9 +90,12 @@ class _DriverFaceViolationsPageState extends State<DriverFaceViolationsPage> {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
-                                    "${violation.first_name} ${violation.last_name}",
-                                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                  Flexible(
+                                    child: Text(
+                                      "${violation.first_name} ${violation.last_name}",
+                                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                      overflow: TextOverflow.ellipsis, // Add ellipsis for long names
+                                    ),
                                   ),
                                   IconButton(
                                     icon: const Icon(Icons.delete, color: Colors.red),
@@ -137,9 +140,8 @@ class _DriverFaceViolationsPageState extends State<DriverFaceViolationsPage> {
                         ),
                       ],
                     ),
-
                   ),
-                ),
+                )
               );
 
             },
